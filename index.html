@@ -8,7 +8,7 @@
       <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="mobile.css">
+
    
 </head>
 <body>
@@ -27,11 +27,22 @@
 <h3>Logga in med användarnamn och lösenord</h3>
 <label for="username">Användarnamn:</label>
 <input type="text" id="username" name="username" placeholder="Användarnamn">
-<label for="password" id="password" name="password">Lösenord:</label>
+<label for="password" name="password">Lösenord:</label>
 <input type="password" id="password" name="password" placeholder="Lösenord">
 <button type="submit">Logga in</button>
 <p id="validationLoggIn"></p>
 </form>
+    </div>
+    <div id="createAccount">
+        <form id="createAccountForm">
+        <h2>Skapa nytt konto</h2>
+        <label for="createUsername">Skapa användarnamn:</label>
+        <input type="text" id="createUsername" name="createUsername" placeholder="Användarnamn">
+        <label for="createPassword" id="createPassword" name="createPassword">Skapa lösenord:</label>
+        <input type="password" id="createPassword" name="createPassword" placeholder="Lösenord">
+        <button type="submit" id="createAccountBtn">Skapa konto</button>
+        </form>
+        <p id="createMsg"></p>
     </div>
 
 <footer class="commercial">
@@ -40,9 +51,9 @@
     <div id="rightFoot">Hyr bilen här</div>
    
     
-    <p>&copy; 2023 Wigellkoncernens Biluthyrning. Alla rättigheter förbehållna.</p>
+    
 </footer>
-
+<p>&copy; 2023 Wigellkoncernens Biluthyrning. Alla rättigheter förbehållna.</p>
     <script src="script.js"></script>
 </body>
 </html>

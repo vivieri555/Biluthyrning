@@ -38,5 +38,6 @@ height: 10vh;
         position: fixed;
         width: 100%;
         display: flex;
-        display: row;
+        flex-direction: row;
+        z-index: -1;
     }
