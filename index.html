@@ -16,19 +16,19 @@
  <img src="KoncernensLogga.png" alt="Wigellkoncernens Biluthyrning Logga" class="logo">
  <nav id="navContainer">
 <ul class="navClass">
-<li><a href="#divBtns">Hyr bil</a></li>
-<li><a href="#divsTable">Avboka bil</a></li>
+<li><a href="#loggInDiv">Logga in</a></li>
+<li><a href="#createAccount">Skapa konto</a></li>
 </ul>
 </nav>
     </div>
 
     <div id="loggInDiv">
 <form id="loggInForm">
-<h3>Logga in med användarnamn och lösenord</h3>
+<h3>Logga in</h3>
 <label for="username">Användarnamn:</label>
-<input type="text" id="username" name="username" placeholder="Användarnamn">
+<input type="text" id="username" name="username" placeholder="Användarnamn"><br>
 <label for="password" name="password">Lösenord:</label>
-<input type="password" id="password" name="password" placeholder="Lösenord">
+<input type="password" id="password" name="password" placeholder="Lösenord"><br>
 <button type="submit">Logga in</button>
 <p id="validationLoggIn"></p>
 </form>
@@ -37,9 +37,19 @@
         <form id="createAccountForm">
         <h2>Skapa nytt konto</h2>
         <label for="createUsername">Skapa användarnamn:</label>
-        <input type="text" id="createUsername" name="createUsername" placeholder="Användarnamn">
-        <label for="createPassword" id="createPassword" name="createPassword">Skapa lösenord:</label>
-        <input type="password" id="createPassword" name="createPassword" placeholder="Lösenord">
+        <input type="text" id="createUsername" name="createUsername" placeholder="Användarnamn"><br>
+        <label for="createPassword" name="createPassword">Skapa lösenord:</label>
+        <input type="password" id="createPassword" name="createPassword" placeholder="Lösenord"><br>
+        <label for="first_name">Förnamn:</label>
+        <input type="text" id="first_name" name="first_name"><br>
+        <label for="last_name">Efternamn:</label>
+        <input type="text" id="last_name" name="last_name"><br>
+        <label for="phone">Telefonnummer:</label>
+        <input type="text" id="phone" name="phone"><br>
+        <label for="email">E-post:</label>
+        <input type="email" id="email" name="email"><br>
+        <label for="role">Roll:</label>
+        <input type="text" id="role" name="role"><br>
         <button type="submit" id="createAccountBtn">Skapa konto</button>
         </form>
         <p id="createMsg"></p>
@@ -55,5 +65,6 @@
 </footer>
 <p>&copy; 2023 Wigellkoncernens Biluthyrning. Alla rättigheter förbehållna.</p>
     <script src="script.js"></script>
+    <script src="usersScript.js"></script>
 </body>
 </html>

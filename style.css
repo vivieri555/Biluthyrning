@@ -32,7 +32,9 @@ height: 10vh;
     #navigation {
         display: flex;
         float: left;
+        box-sizing: border-box;
     }
+   
     .commercial {
         bottom: 0;
         position: fixed;
@@ -40,4 +42,16 @@ height: 10vh;
         display: flex;
         flex-direction: row;
         z-index: -1;
+    }
+    #loggInDiv {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+        margin-bottom: 20px;
+        gap: 20px;
+        box-sizing: border-box;
+    }
+     .box {
+        flex:1;
     }

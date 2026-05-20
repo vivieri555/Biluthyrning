@@ -45,12 +45,8 @@ function getLogIn() {
 }
 
 let headersPost = new Headers(); 
-//headersPost.append('Access-Control-Allow-Origin', 'http://localhost:8080'); 
-//headersPost.append('Access-Control-Allow-Methods', 'POST'); 
-//headersPost.append('Access-Control-Allow-Headers', 'Accept, Authorization, Content-Type'); 
 headersPost.append("Content-Type", "application/json");
 headersPost.append("Accept", "application/json");
-//headersPost.append("Authorization", `Basic ${basicAuth}`); 
 
 function postLogIn() {
 const data = {
@@ -76,6 +72,11 @@ fetch(url, {
     loggInAttempts = 0;
     logEvent("Användaren har loggat in.");
     //Ska man skicka användaren till en annan sida efter inloggning?
+
+const loggInForm = document.getElementById("loggInForm");
+loggInForm.style.display = "none";
+navContainer.style.display = "none";
+
 })
 .catch((error) => {
     loggInAttempts++;
