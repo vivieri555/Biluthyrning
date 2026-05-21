@@ -42,7 +42,7 @@
     <a href="#createAccount">Skapa ny användare</a> 
     <a href="#getAllUsers">Hämta alla användare</a> 
     <a href="#updatePutUser">Uppdatera användare</a> 
-    <a href="#">Ta bort användare</a>
+    <a href="#deleteUser">Ta bort användare</a>
     <a href="#">Hämta specifik användare</a>
   </div> 
 </li>
@@ -102,9 +102,31 @@
 <input type="text" id="updateRole" name="updateRole"><br>
 
         <button id="updateUserBtn">Uppdatera</button>
-        
+
         <p id="updateMsg"></p>
         </form>
+    </div>
+
+    <!-- Radera användare metod-->
+<div id="deleteUser" class="hidden">
+    <h2>Radera användare</h2>
+    <form id="deleteUserForm">
+
+        <label for="deleteUserId">Användar-ID:</label>
+        <input type="text" id="deleteUserId" name="deleteUserId"><br>
+        <button id="deleteUserBtn">Radera användare</button>
+        <p id="deleteMsg"></p>
+    </form>
+    </div>
+
+    <div id="getUser" class="hidden">
+    <h2>Hämta specifik användare</h2>
+    <form id="getUserForm">
+        <label for="getUserId">Användar-ID:</label>
+        <input type="text" id="getUserId" name="getUserId"><br>
+        <button id="getUserBtn">Hämta användare</button>
+        <p id="getUserMsg"></p>
+    </form>
     </div>
 
     <div id="createAccount">

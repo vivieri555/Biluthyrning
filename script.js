@@ -104,7 +104,7 @@ const getAllUsersLink = document.querySelector('a[href="#getAllUsers"]');
 if (getAllUsersLink) {
     getAllUsersLink.addEventListener("click", function(event) {
         event.preventDefault();
-        
+        hideAllSections();
         const targetDiv = document.getElementById("getAllUsers");
         if (targetDiv) {
             targetDiv.classList.remove("hidden");
@@ -190,7 +190,7 @@ const fields = {
         "updateRole": "Roll",
         "updatePassword": "Lösenord",
         "updateUsername": "Användarnamn",
-        "updateMsg": "Meddelande-tagg"
+        "updateMsg": "Meddelande"
     };
 
     // Loopa igenom och varna om något saknas i HTML
@@ -222,7 +222,6 @@ const fields = {
         return;
 }
 const updateData = {
-    id: parseInt(userId),
     firstName: first_name,
     lastName: last_name,
     phone: phone,
@@ -263,7 +262,7 @@ const updateUser = document.querySelector('a[href="#updatePutUser"]');
 if (updateUser) {
     updateUser.addEventListener("click", function(event) {
         event.preventDefault();
-        
+        hideAllSections();
         const targetDiv = document.getElementById("updatePutUser");
         if (targetDiv) {
             targetDiv.classList.remove("hidden");
@@ -271,3 +270,67 @@ if (updateUser) {
         document.getElementById("myDropdown").classList.remove("show");
     });
 }
+
+const deleteUserLink = document.querySelector('a[href="#deleteUser"]');
+const deleteMsg = document.getElementById("deleteMsg");
+
+if(deleteUserLink) {
+    deleteUserLink.addEventListener("click", function(event) {
+        event.preventDefault();
+        hideAllSections();
+        const targetDiv = document.getElementById("deleteUser");
+        if (targetDiv) {
+            targetDiv.classList.remove("hidden");
+        }
+        document.getElementById("myDropdown").classList.remove("show");
+    });
+}
+
+let headDeleteUser = new Headers();
+headDeleteUser.append("Content-Type", "application/json");
+headDeleteUser.append("Accept", "application/json");
+
+const deleteUserBtn = document.getElementById("deleteUserBtn");
+if (deleteUserBtn){
+    deleteUserBtn.addEventListener("click", function(event) {
+event.preventDefault();
+deleteUser();
+    })
+}
+
+
+function deleteUser() {
+let id = document.getElementById("deleteUserId").value;
+const url = `http://localhost:8080/api/v1/users/${id}`;
+fetch(url, {
+    method: "DELETE",
+    headers: headDeleteUser,
+    credentials: "include"
+})
+.then((response) => {
+    if (!response.ok) throw new Error("Gick inte att ta bort användare");
+    const data = response.text();
+    if (data === null) throw new Error("Inget returnerades");
+    deleteMsg.innerHTML = JSON.stringify(data);
+    deleteMsg.style.color = "green";
+    deleteMsg.textContent = "Användaren har tagits bort!";
+    document.getElementById("deleteUserForm").reset();
+    
+})
+.catch((error) => {
+    console.error("Error:", error);
+    deleteMsg.textContent = "Gick inte att radera. Försök igen senare.";
+    deleteMsg.style.color = "red";
+});
+}
+
+function hideAllSections() {
+    const sections = ["loggInDiv", "getAllUsers", "updatePutUser", "deleteUser"];
+    sections.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) element.classList.add("hidden");
+    });
+}
+
+
+//Hämta en specifik användare
