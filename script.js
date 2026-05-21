@@ -6,6 +6,14 @@ let loggInAttempts = 0;
 const password = "user";
 const username = "user";
 
+function hideAllSections() {
+    const sections = ["loggInDiv", "createAccount", "getAllUsers", "updatePutUser", "deleteUser", "getUser"];
+    sections.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) element.classList.add("hidden");
+    });
+}
+
 function logEvent(message) {
     const timestamp = new Date().toLocaleString();
     console.log(`[${timestamp}] ${message}`);
@@ -324,13 +332,81 @@ fetch(url, {
 });
 }
 
-function hideAllSections() {
-    const sections = ["loggInDiv", "getAllUsers", "updatePutUser", "deleteUser"];
-    sections.forEach(id => {
-        const element = document.getElementById(id);
-        if (element) element.classList.add("hidden");
+
+//Hämta en specifik användare
+const getUserLink = document.querySelector('a[href="#getUser"]'); 
+
+if (getUserLink) { 
+    getUserLink.addEventListener("click", function(event) { 
+        event.preventDefault(); 
+        hideAllSections(); 
+
+        const targetDiv = document.getElementById("getUser"); 
+        if (targetDiv) { 
+            targetDiv.classList.remove("hidden"); 
+        } 
+        document.getElementById("myDropdown").classList.remove("show"); 
+    }); 
+} 
+
+const getUserBtn = document.getElementById("getUserBtn"); 
+
+if (getUserBtn) { 
+    getUserBtn.addEventListener("click", function(event) { 
+        event.preventDefault();
+        getUser(); 
+    }); 
+} 
+
+ 
+function getUser() { 
+const getUserId = document.getElementById("getUserId").value;
+const getUserMsg = document.getElementById("getUserMsg");
+const url = `http://localhost:8080/api/v1/users/${getUserId}`; 
+const userData = {
+    id: getUserId
+}
+
+fetch(url, { 
+    method: "GET", 
+    mode: "cors", 
+    credentials: "include"
+}) 
+.then((response) => {    
+    if (!response.ok) throw new Error("Något gick fel med att hämta användare"); 
+    return response.json(); 
+}) 
+.then((user) => { 
+   getUserMsg.textContent = `Användare: ${user.username} - ${user.firstName} ${user.lastName} - 
+   ${user.email} - ${user.phone} - ${user.role}`;
+   document.getElementById("getUserForm").reset();
+}) 
+.catch((error) => { 
+    console.error("Error:", error); 
+}); 
+} 
+
+const loginLink = document.querySelector('a[href="#loggInDiv"]');
+if (loginLink) {
+    loginLink.addEventListener("click", function(event) {
+        event.preventDefault();
+        hideAllSections();
+        
+        const loggInDiv = document.getElementById("loggInDiv");
+        if (loggInDiv) {
+            loggInDiv.classList.remove("hidden"); // Visa inloggningen
+        }
     });
 }
 
-
-//Hämta en specifik användare
+const createAccountLink = document.querySelector('a[href="#createAccount"]');
+if (createAccountLink) {
+    createAccountLink.addEventListener("click", function(event) {
+        event.preventDefault();
+        hideAllSections();
+        const createDiv = document.getElementById("createAccount");
+        if(createDiv) {
+            createDiv.classList.remove("hidden");
+        }
+    });
+}

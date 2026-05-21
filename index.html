@@ -27,7 +27,11 @@
     <div id="headerRight"></div>
 </header>
      
-
+<div id="startPage" class="hidden">
+    <h4>Välkommen till Wigellkoncernens Biluthyrning</h4>
+    <h3>Här finns många trevliga bilar att hyra!</h3>
+    <h3>Logga in eller skapa ett konto för att komma igång</h3>
+</div>
     
 <header id="adminNav" class="adminNavContainer hidden">
     <div class="logoHeaderContainer">
@@ -43,7 +47,7 @@
     <a href="#getAllUsers">Hämta alla användare</a> 
     <a href="#updatePutUser">Uppdatera användare</a> 
     <a href="#deleteUser">Ta bort användare</a>
-    <a href="#">Hämta specifik användare</a>
+    <a href="#getUser">Hämta specifik användare</a>
   </div> 
 </li>
                 <li><a href="#">Bokningar</a></li>
@@ -55,7 +59,7 @@
            
     
 
-    <div id="loggInDiv">
+    <div id="loggInDiv" class="hidden">
 <form id="loggInForm">
 <h3>Logga in</h3>
 <label for="username">Användarnamn:</label>
@@ -114,28 +118,29 @@
 
         <label for="deleteUserId">Användar-ID:</label>
         <input type="text" id="deleteUserId" name="deleteUserId"><br>
-        <button id="deleteUserBtn">Radera användare</button>
+        <button id="deleteUserBtn">Radera</button>
         <p id="deleteMsg"></p>
     </form>
     </div>
 
+    <!-- Hämta en användare bara   -->
     <div id="getUser" class="hidden">
     <h2>Hämta specifik användare</h2>
     <form id="getUserForm">
         <label for="getUserId">Användar-ID:</label>
         <input type="text" id="getUserId" name="getUserId"><br>
-        <button id="getUserBtn">Hämta användare</button>
+        <button id="getUserBtn">Hämta</button>
         <p id="getUserMsg"></p>
     </form>
     </div>
 
-    <div id="createAccount">
+    <div id="createAccount" class="hidden">
         <form id="createAccountForm">
         <h2>Skapa nytt konto</h2>
-        <label for="createUsername">Skapa användarnamn:</label>
-        <input type="text" id="createUsername" name="createUsername" placeholder="Användarnamn"><br>
-        <label for="createPassword" name="createPassword">Skapa lösenord:</label>
-        <input type="password" id="createPassword" name="createPassword" placeholder="Lösenord"><br>
+        <label for="createUsername">Användarnamn:</label>
+        <input type="text" id="createUsername" name="createUsername"><br>
+        <label for="createPassword" name="createPassword">Lösenord:</label>
+        <input type="password" id="createPassword" name="createPassword"><br>
         <label for="first_name">Förnamn:</label>
         <input type="text" id="first_name" name="first_name"><br>
         <label for="last_name">Efternamn:</label>
