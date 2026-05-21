@@ -27,7 +27,7 @@
     <div id="headerRight"></div>
 </header>
      
-<div id="startPage" class="hidden">
+<div id="startPage">
     <h4>Välkommen till Wigellkoncernens Biluthyrning</h4>
     <h3>Här finns många trevliga bilar att hyra!</h3>
     <h3>Logga in eller skapa ett konto för att komma igång</h3>
@@ -138,24 +138,49 @@
         <form id="createAccountForm">
         <h2>Skapa nytt konto</h2>
         <label for="createUsername">Användarnamn:</label>
-        <input type="text" id="createUsername" name="createUsername"><br>
+        <input type="text" id="createUsername" name="createUsername">
         <label for="createPassword" name="createPassword">Lösenord:</label>
-        <input type="password" id="createPassword" name="createPassword"><br>
+        <input type="password" id="createPassword" name="createPassword">
         <label for="first_name">Förnamn:</label>
-        <input type="text" id="first_name" name="first_name"><br>
+        <input type="text" id="first_name" name="first_name">
         <label for="last_name">Efternamn:</label>
-        <input type="text" id="last_name" name="last_name"><br>
+        <input type="text" id="last_name" name="last_name">
         <label for="phone">Telefonnummer:</label>
-        <input type="text" id="phone" name="phone"><br>
+        <input type="text" id="phone" name="phone">
         <label for="email">E-post:</label>
-        <input type="email" id="email" name="email"><br>
+        <input type="email" id="email" name="email">
         <label for="role">Roll:</label>
-        <input type="text" id="role" name="role"><br>
+        <input type="text" id="role" name="role">
         <button type="submit" id="createAccountBtn">Skapa konto</button>
         </form>
         <p id="createMsg"></p>
     </div>
 
+    <div id="createCarDiv">
+        <form id="createCarForm">
+            <h2>Skapa en ny bil</h2>
+            <label for="carName">Namn:</label>
+            <input type="text" id="carName" name="carName">
+            <label for="model">Modell:</label>
+            <input type="text" id="model" name="model">
+            <label for="feature1">Egenskap 1:</label>
+            <input type="text" id="feature1" name="feature1">
+            <label for="feature2">Egenskap 2:</label>
+            <input type="text" id="feature2" name="feature2">
+            <label for="feature3">Egenskap 3:</label>
+            <input type="text" id="feature3" name="feature3">
+            <label for="type">Typ av bil:</label>
+            <input type="text" id="type" name="type" placeholder="SUV, el, sport osv">
+            <label for="price">Pris per dag:</label>
+            <input type="number" id="price" name="price">
+            <label for="booked">Bokad:</label>
+            <input type="checkbox" id="booked" name="booked">
+            <label for="imageUrl">Bild-URL:</label>
+            <input type="text" id="imageUrl" name="imageUrl">
+            <button type="submit" id="createCarBtn">Skapa bil</button>
+        </form>
+        <p id="createCarMsg"></p>
+    </div>
 
 <footer class="commercial">
     <div class="commercialText"> <p>Reklamplatser</p></div>

@@ -19,6 +19,61 @@ function logEvent(message) {
     console.log(`[${timestamp}] ${message}`);
 }
 
+document.getElementById("createAccountForm").addEventListener("submit", function(event) {
+    event.preventDefault();
+
+    const username = document.getElementById("createUsername").value;
+    const password = document.getElementById("createPassword").value;
+    const first_name = document.querySelector("input[name='first_name']").value;
+    const last_name = document.querySelector("input[name='last_name']").value;
+    const phone = document.querySelector("input[name='phone']").value;
+    const email = document.querySelector("input[name='email']").value;
+    const no_of_orders = 0;
+    const role = document.querySelector("input[name='role']").value;
+    const createMsg = document.getElementById("createMsg");
+    createMsg.textContent = "";
+
+    const newUser = {
+        username: username,
+        password: password,
+        firstName: first_name,
+        lastName: last_name,
+        phone: phone,
+        email: email,
+        noOfOrders: no_of_orders,
+        role: role
+    }
+    fetch("http://localhost:8080/api/v1/users", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newUser),
+        credentials: "include"
+})
+.then(function(response) {
+    if (response === 204 || response.headers.get("Content-Type") === "0") {
+             return { status: response.ok, data: {} };
+         }
+    return response.json().then(function(data) {
+        return  { status: response.ok, data: data };
+    });
+})
+.then(function(result) {
+    if (result.status) {
+        alert("Konto sparat!");
+        document.getElementById("createAccountForm").reset();
+    } else {
+        createMsg.textContent = result.data.message || "Misslyckades att spara konto.";
+    }
+})
+.catch(function(error) {
+    console.error("Error:", error);
+    createMsg.textContent = "Ett fel inträffade. Försök igen senare.";
+});
+}
+);
+
 loggInForm.addEventListener("submit", function(event) {
     event.preventDefault();
     validationLoggIn.textContent = "";
@@ -394,7 +449,8 @@ if (loginLink) {
         
         const loggInDiv = document.getElementById("loggInDiv");
         if (loggInDiv) {
-            loggInDiv.classList.remove("hidden"); // Visa inloggningen
+            loggInDiv.classList.remove("hidden");
+            document.getElementById("startPage").classList.add("hidden");
         }
     });
 }
@@ -407,6 +463,65 @@ if (createAccountLink) {
         const createDiv = document.getElementById("createAccount");
         if(createDiv) {
             createDiv.classList.remove("hidden");
+            document.getElementById("startPage").classList.add("hidden");
         }
     });
 }
+
+//Länk för att komma tillbaka till startsidan, funkar inte än
+//KOLLA SEN
+const logoLink = document.querySelector('a[href="#logoLogIn"]');
+
+if (logoLink) {
+    logoLink.addEventListener("click", function(event) {
+        event.preventDefault();
+        hideAllSections();
+        
+        const startPage = document.getElementById("startPage");
+        if (startPage) {
+            startPage.classList.remove("hidden");
+        }
+    });
+}
+
+//Skapa ny bil
+
+headersPostCar = new Headers();
+headersPostCar.append("Content-Type", "application/json");
+headersPostCar.append("Accept", "application/json");
+
+document.getElementById("createCarForm").addEventListener("submit", function(event) { 
+    event.preventDefault(); 
+
+    const carName = document.getElementById("carName").value;
+    const model = document.getElementById("model").value;
+    const feature1 = document.getElementById("feature1").value;
+    const feature2 = document.getElementById("feature2").value;
+    const feature3 = document.getElementById("feature3").value;
+    const type = document.getElementById("type").value;
+    const price = document.getElementById("price").value;
+    const booked = false;
+    const createCarMsg = document.getElementById("createCarMsg");
+    createCarMsg.textContent = "";
+
+    const url = "http://localhost:8080/api/v1/cars";
+    const newCar = {
+        carName: carName,
+        model: model,
+        feature1: feature1,
+        feature2: feature2,
+        feature3: feature3,
+        type: type,
+        price: price,
+        booked: booked
+    }
+    fetch(url, {
+        method: "POST",
+        headers: headersPostCar,
+        body: JSON.stringify(newCar),
+        credentials: "include"
+    })
+    .then((response) => {
+        
+    })
+    })
