@@ -41,7 +41,7 @@
   <div id="myDropdown" class="dropdown-content"> 
     <a href="#createAccount">Skapa ny användare</a> 
     <a href="#getAllUsers">Hämta alla användare</a> 
-    <a href="#">Uppdatera användare</a> 
+    <a href="#updatePutUser">Uppdatera användare</a> 
     <a href="#">Ta bort användare</a>
     <a href="#">Hämta specifik användare</a>
   </div> 
@@ -73,9 +73,38 @@
         <ul id="userList"></ul>
     </div>
 
-    <div id="updatePutUser">
+
+    <div id="updatePutUser" class="hidden">
         <h2>Uppdatera användare</h2>
+        <form id="updatePutUserForm">
+            <label for="updateUserId">Användar-ID:</label>
+<input type="text" id="updateUserId" name="updateUserId"><br>
+
+<label for="updateUsername">Användarnamn:</label>
+<input type="text" id="updateUsername" name="updateUsername"><br>
+
+<label for="updatePassword">Lösenord:</label>
+<input type="password" id="updatePassword" name="updatePassword"><br>
+
+<label for="updateFirstName">Förnamn:</label>
+<input type="text" id="updateFirstName" name="updateFirst_name"><br>
+
+<label for="updateLastName">Efternamn:</label>
+<input type="text" id="updateLastName" name="updateLast_name"><br>
+
+<label for="updatePhone">Telefonnummer:</label>
+<input type="text" id="updatePhone" name="updatePhone"><br>
+
+<label for="updateEmail">E-post:</label>
+<input type="email" id="updateEmail" name="updateEmail"><br>
+
+<label for="updateRole">Roll:</label>
+<input type="text" id="updateRole" name="updateRole"><br>
+
         <button id="updateUserBtn">Uppdatera</button>
+        
+        <p id="updateMsg"></p>
+        </form>
     </div>
 
     <div id="createAccount">

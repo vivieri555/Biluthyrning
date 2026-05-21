@@ -168,3 +168,106 @@ fetch(url, {
     console.error("Error:", error);
 });
 }
+
+const updateUserBtn = document.getElementById("updateUserBtn");
+updateUserBtn.addEventListener("click", function(event) {
+    event.preventDefault();
+    putUser();
+});
+
+let headPut = new Headers();
+headPut.append("Content-Type", "application/json");
+headPut.append("Accept", "application/json");
+
+
+function putUser() {
+const fields = {
+        "updateUserId": "Användar-ID",
+        "updateFirstName": "Förnamn",
+        "updateLastName": "Efternamn",
+        "updatePhone": "Telefonnummer",
+        "updateEmail": "E-post",
+        "updateRole": "Roll",
+        "updatePassword": "Lösenord",
+        "updateUsername": "Användarnamn",
+        "updateMsg": "Meddelande-tagg"
+    };
+
+    // Loopa igenom och varna om något saknas i HTML
+    for (let id in fields) {
+        if (!document.getElementById(id)) {
+            console.error(`FELSÖKNING: Elementet med id="${id}" (${fields[id]}) saknas helt i din HTML-kod!`);
+        }
+    }
+
+    // Om något saknas använder vi ?.value så att koden inte kraschar med rött fel
+    const userId = document.getElementById("updateUserId")?.value || "";
+    const first_name = document.getElementById("updateFirstName")?.value || "";
+    const last_name = document.getElementById("updateLastName")?.value || "";
+    const phone = document.getElementById("updatePhone")?.value || "";
+    const email = document.getElementById("updateEmail")?.value || "";
+    const role = document.getElementById("updateRole")?.value || "";
+    const updatePassword = document.getElementById("updatePassword")?.value || "";
+    const updateUsername = document.getElementById("updateUsername")?.value || "";
+    const updateMsg = document.getElementById("updateMsg");
+
+    if (updateMsg) updateMsg.textContent = "";
+
+
+ if (!userId) {
+    if (updateMsg) {
+        updateMsg.textContent = "Ange ett giltigt användar-ID.";
+        updateMsg.style.color = "red";
+        }
+        return;
+}
+const updateData = {
+    id: parseInt(userId),
+    firstName: first_name,
+    lastName: last_name,
+    phone: phone,
+    email: email,
+    role: role,
+    username: updateUsername,
+    password: updatePassword
+};
+   
+     const url = `http://localhost:8080/api/v1/users/${userId}`;
+fetch(url, {
+    method: "PUT",
+    headers: headPut,
+    body: JSON.stringify(updateData),
+    mode: "cors",
+    credentials: "include"
+})
+.then((response) => {
+    if (!response.ok) throw new Error("Gick inte att uppdatera");
+    return response.json();
+})
+.then((data) => {
+    if (updateMsg) {
+        updateMsg.style.color = "green";
+        updateMsg.textContent = "Användaren har uppdaterats i databasen!";
+        document.getElementById("updatePutUserForm").reset();
+    }
+    console.log("Uppdatering lyckades:", data);
+})
+.catch((error) => {
+    console.error("Error:", error);
+    updateMsg.textContent = "Ett fel inträffade. Försök igen senare.";
+    updateMsg.style.color = "red";
+});
+}
+
+const updateUser = document.querySelector('a[href="#updatePutUser"]');
+if (updateUser) {
+    updateUser.addEventListener("click", function(event) {
+        event.preventDefault();
+        
+        const targetDiv = document.getElementById("updatePutUser");
+        if (targetDiv) {
+            targetDiv.classList.remove("hidden");
+        }
+        document.getElementById("myDropdown").classList.remove("show");
+    });
+}
