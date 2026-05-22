@@ -21,6 +21,7 @@
 <ul class="navClass">
 <li><a href="#loggInDiv">Logga in</a></li>
 <li><a href="#createAccount">Skapa konto</a></li>
+<li><a href=".getAllCars">Se bilar</a></li>
 </ul>
 </nav>
     </div>
@@ -39,7 +40,16 @@
     </div>
     <div id="adminMenuCenter">
     <ul class="adminNavClass" id="adminMenu">
-                <li><a href="#">Bilar</a></li>
+                
+                <li class="dropdownMenu">
+                    <button id="carAdminBtn">Hantera Bilar</button>
+                    <div id="CarAdminDivDrop" class="dropdown-content">
+                        <a href=".getAllCars">Se alla Bilar</a>
+                        <a href="#getACar">Hämta specifik bil</a>
+                        <a href="#deleteCar">Radera bil</a>
+                    </div>
+                </li>
+                
                 <li class="dropdownMenu">
   <button id="dropAdminBtn">Användare</button> 
   <div id="myDropdown" class="dropdown-content"> 
@@ -203,6 +213,33 @@
         </form>
         <p id="createCarMsg"></p>
     </div>
+
+    <div class="getAllCars hidden">
+<h2>Se vilka bilar som finns</h2>
+<ul id="carList"></ul>
+<p id="getAllCarsMsg"></p>
+    </div>
+
+    <div id="deleteCar" class="hidden">
+        <h2>Radera bil</h2>
+        <form for="deleteCarForm">
+            <label for="deleteCarId">Ange bilens id:</label>
+            <input type="text" id="deleteCarId" name="deleteCarId">
+            <button id="deleteCarBtn">Radera</button>
+            <p id="deleteCarMsg"></p>
+        </form>
+    </div>
+
+    <div id="getACar" class="hidden">
+        <h2>Hämta en specifik bil</h2>
+        <form id="getACarForm">
+            <label for="getACarId">Ange bilens id:</label>
+            <input type="text" id="getACarId" name="getACarId">
+            <button id="getACarBtn">Hämta</button>
+            <p id="getACarMsg"></p>
+        </form>
+    </div>
+
 
 <footer class="commercial">
     <div class="commercialText"> <p>Reklamplatser</p></div>

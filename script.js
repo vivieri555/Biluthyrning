@@ -7,7 +7,8 @@ const password = "user";
 const username = "user";
 
 function hideAllSections() {
-    const sections = ["loggInDiv", "createAccount", "getAllUsers", "updatePutUser", "deleteUser", "getUser"];
+    const sections = ["loggInDiv", "createAccount", "getAllUsers", "updatePutUser", 
+        "deleteUser", "getUser", "getAllCars"];
     sections.forEach(id => {
         const element = document.getElementById(id);
         if (element) element.classList.add("hidden");
@@ -159,13 +160,14 @@ if (getAllUsersLink) {
 
 //Funktion för dropdownmenyn i adminpanelen
 const dropAdminBtn = document.getElementById("dropAdminBtn");
+
 if (dropAdminBtn) {
     dropAdminBtn.onclick = function(event) {
         document.getElementById("myDropdown").classList.toggle("show"); 
         event.stopPropagation();
     };
-}
-/* toggla mellan att visa o ta bort menyn visuellt */ 
+} 
+//toggla mellan att visa o ta bort menyn visuellt
 window.onclick = function(event) { 
 
   if (!event.target.matches('.dropAdminBtn')) { 
@@ -178,7 +180,9 @@ window.onclick = function(event) {
       } 
     } 
   } 
-} 
+}
+
+
 //Anrop till hämtning av användare
 const getAllUsersBtn = document.getElementById("getAllUsersBtn");
 if (getAllUsersBtn) {
@@ -476,7 +480,7 @@ const feature1 = document.getElementById("feature1").value;
 const feature2 = document.getElementById("feature2").value;
 const feature3 = document.getElementById("feature3").value;
 const type = document.getElementById("type").value;
-const price = document.getElementById("price").value;   // Skapa denna först!
+const price = document.getElementById("price").value;
 const booked = document.getElementById("booked").checked;
 
     const formData = new FormData();
@@ -528,3 +532,85 @@ return response.json().then((data) => {
         createCarMsg.textContent = "Ett fel inträffade. Försök igen senare.";
     })
     });
+
+    //Hämta bil för alla
+    let headersCarGet = new Headers();
+     headersCarGet.append("Content-Type", "application/json");
+     headersCarGet.append("Accept", "application/json");
+
+    function getCars() {
+        const url = "http://localhost:8080/api/v1/cars";
+
+        fetch(url, {
+        method: "GET",
+        headers: headersCarGet
+    })
+    .then((response) => {
+        if (!response.ok) {
+            throw new Error(`Serverfel: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then((cars) => {
+        const carList = document.getElementById("carList");
+        carList.innerHTML = "";
+
+        cars.forEach((car) => { 
+            const li = document.createElement("li"); 
+            li.textContent = `${car.name}, ${car.model}, ${car.feature1}, ${car.feature2}, ${car.feature3}, ${car.type}, ${car.price}. ID: ${car.id}`;
+            carList.appendChild(li);
+        });
+    })
+    .catch((error) => {
+        console.error("Error:", error);
+    });
+}
+
+const getAllCarsLink = document.querySelectorAll('a[href=".getAllCars"]');
+
+getAllCarsLink.forEach(function(link) {
+    link.addEventListener("click", function(event) {
+        event.preventDefault(); 
+        hideAllSections();
+        
+        const targetDiv = document.querySelector(".getAllCars");
+        if (targetDiv) { 
+            targetDiv.classList.remove("hidden"); 
+        }
+        
+        const dropdown = document.getElementById("myDropdown");
+        if (dropdown) {
+            dropdown.classList.remove("show");
+        }
+       
+        getCars(); 
+    });
+});
+let headersDelCar = new Headers();
+headersDelCar.append("Content-Type", "application/json");
+headersDelCar.append("Accept", "application/json");
+
+//Radera bil metod
+function deleteCar() {
+    let id = document.getElementById("deleteCarId").value;
+    const deleteCarMsg = document.getElementById("deleteCarMsg");
+    const url = `http://localhost:8080/api/v1/cars/${id}`;
+    fetch( url, {
+        method: "DELETE",
+        headers: headersDelCar,
+        credentials: "include"
+    })
+    .then((response) => {
+        if(!response.ok) throw new Error("Gick inte att ta bort bil");
+        const data = response.text();
+        if(data === null) throw new Error("Inget returneras");
+        deleteCarMsg.textContent = "Bilen har tagits bort!"
+        deleteCarMsg.style.color = "green";
+        document.getElementById("deleteCarForm");
+    })
+    .catch((error) => {
+        console.error("Error:", error);
+        deleteCarMsg.textContent = "Gick inte att radera. Försök igen senare.";
+        deleteCarMsg.style.color = "red";
+    });
+}
