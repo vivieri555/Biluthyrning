@@ -43,7 +43,7 @@
                 <li class="dropdownMenu">
   <button id="dropAdminBtn">Användare</button> 
   <div id="myDropdown" class="dropdown-content"> 
-    <a href="#createAccount">Skapa ny användare</a> 
+    <a href="#createAccount2">Skapa ny användare</a> 
     <a href="#getAllUsers">Hämta alla användare</a> 
     <a href="#updatePutUser">Uppdatera användare</a> 
     <a href="#deleteUser">Ta bort användare</a>
@@ -156,6 +156,28 @@
         <p id="createMsg"></p>
     </div>
 
+    <div id="createAccount2" class="hidden">
+        <form id="createAccountForm">
+        <h2>Skapa nytt konto</h2>
+        <label for="createUsername">Användarnamn:</label>
+        <input type="text" id="createUsername" name="createUsername">
+        <label for="createPassword" name="createPassword">Lösenord:</label>
+        <input type="password" id="createPassword" name="createPassword">
+        <label for="first_name">Förnamn:</label>
+        <input type="text" id="first_name" name="first_name">
+        <label for="last_name">Efternamn:</label>
+        <input type="text" id="last_name" name="last_name">
+        <label for="phone">Telefonnummer:</label>
+        <input type="text" id="phone" name="phone">
+        <label for="email">E-post:</label>
+        <input type="email" id="email" name="email">
+        <label for="role">Roll:</label>
+        <input type="text" id="role" name="role">
+        <button type="submit" id="createAccountBtn">Skapa konto</button>
+        </form>
+        <p id="createMsg"></p>
+    </div>
+
     <div id="createCarDiv">
         <form id="createCarForm">
             <h2>Skapa en ny bil</h2>
@@ -175,8 +197,8 @@
             <input type="number" id="price" name="price">
             <label for="booked">Bokad:</label>
             <input type="checkbox" id="booked" name="booked">
-            <label for="imageUrl">Bild-URL:</label>
-            <input type="text" id="imageUrl" name="imageUrl">
+            <label for="carImage">Bild på bil</label>
+            <input type="file" id="carImage" accept="image/*">
             <button type="submit" id="createCarBtn">Skapa bil</button>
         </form>
         <p id="createCarMsg"></p>
@@ -193,6 +215,5 @@
 <p>&copy; 2023 Wigellkoncernens Biluthyrning. Alla rättigheter förbehållna.</p>
     <script src="script.js"></script>
     <script src="usersScript.js"></script>
-    <script src="adminScript.js"></script>
 </body>
 </html>

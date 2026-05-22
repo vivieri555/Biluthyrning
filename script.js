@@ -82,25 +82,6 @@ loggInForm.addEventListener("submit", function(event) {
 
 const basicAuth = btoa('${username}:${password}'); //koda användarnamn och lösenord i Base64 
 
-function getLogIn() {
-    const url = "http://localhost:8080/api/v1/auth/login";
-    fetch(url,
-        {
-            method: "GET",
-            headers: headers
-        }
-    ) .then((response) => {
-        console.log(response.status);
-        if (!response.ok) throw new Error("Något gick fel med valideringen");
-        return response.json();
-    })
-    .then(data => {
-        validationLoggIn.textContent = data[0].firstName;
-    })
-    .catch((error) => {
-        console.error("Error:", error);
-    })
-}
 
 let headersPost = new Headers(); 
 headersPost.append("Content-Type", "application/json");
@@ -486,42 +467,64 @@ if (logoLink) {
 
 //Skapa ny bil
 
-headersPostCar = new Headers();
-headersPostCar.append("Content-Type", "application/json");
-headersPostCar.append("Accept", "application/json");
-
 document.getElementById("createCarForm").addEventListener("submit", function(event) { 
     event.preventDefault(); 
 
-    const carName = document.getElementById("carName").value;
-    const model = document.getElementById("model").value;
-    const feature1 = document.getElementById("feature1").value;
-    const feature2 = document.getElementById("feature2").value;
-    const feature3 = document.getElementById("feature3").value;
-    const type = document.getElementById("type").value;
-    const price = document.getElementById("price").value;
-    const booked = false;
+const carName = document.getElementById("carName").value;
+const model = document.getElementById("model").value;
+const feature1 = document.getElementById("feature1").value;
+const feature2 = document.getElementById("feature2").value;
+const feature3 = document.getElementById("feature3").value;
+const type = document.getElementById("type").value;
+const price = document.getElementById("price").value;   // Skapa denna först!
+const booked = document.getElementById("booked").checked;
+
+    const formData = new FormData();
+    const priceValue = parseFloat(price) || 0.0;
+     const bookedValue = (booked === true || booked === "true");
+    formData.append("name", carName);
+    formData.append("model", model);
+    formData.append("feature1", feature1);
+    formData.append("feature2", feature2);
+    formData.append("feature3", feature3);
+    formData.append("type", type);
+    formData.append("price", price);
+    formData.append("booked", booked);
+    
+    const imageInput = document.getElementById("carImage");
+
+    if (imageInput.files.length > 0) {
+    formData.append("image", imageInput.files[0]); 
+}
+
     const createCarMsg = document.getElementById("createCarMsg");
     createCarMsg.textContent = "";
 
     const url = "http://localhost:8080/api/v1/cars";
-    const newCar = {
-        carName: carName,
-        model: model,
-        feature1: feature1,
-        feature2: feature2,
-        feature3: feature3,
-        type: type,
-        price: price,
-        booked: booked
-    }
+    
     fetch(url, {
         method: "POST",
-        headers: headersPostCar,
-        body: JSON.stringify(newCar),
+        body: formData,
         credentials: "include"
     })
     .then((response) => {
-        
+if (response === 204 || response.headers.get("Content-Type") === "0") {
+    return { status: response.ok, data: {} };
+}
+return response.json().then((data) => {
+    return { status: response.ok, data: data };
+});
     })
+    .then((result) => {
+        if (result.status) {
+            alert("Bilen har lagts till i systemet!");
+            document.getElementById("createCarForm").reset();
+        } else {
+            createCarMsg.textContent = result.data.message || "Misslyckades att lägga till bilen.";
+        }
     })
+    .catch((error) => {
+        console.error("Error:", error);
+        createCarMsg.textContent = "Ett fel inträffade. Försök igen senare.";
+    })
+    });
