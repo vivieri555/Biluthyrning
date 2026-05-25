@@ -24,11 +24,11 @@
 </ul>
 </nav>
     </div>
-    <div id="headerRight"></div>
+    <div class="headerRight"></div>
 </header>
      
 <div id="startPage">
-    <h4>Välkommen till Wigellkoncernens Biluthyrning</h4>
+    <h2>Välkommen till Wigellkoncernens Biluthyrning</h2>
     <h3>Här finns många trevliga bilar att hyra!</h3>
     <h3>Logga in eller skapa ett konto för att komma igång</h3>
 </div>
@@ -64,9 +64,24 @@
                 <li><a href="#">Logga ut?</a></li>
             </ul>
     </div>
-<div id="headerRight"></div>
+<div class="headerRight"></div>
     </header>
-           
+    
+<header id="userHeader" class="hidden">
+      <div class="logoUserContainer">
+        <img src="KoncernensLogga.png" alt="Wigellkoncernens Biluthyrning Logga">
+    </div>
+    <div id="userMenuCenter">
+        <ul class="userNavClass">
+            <li><a href=".getAllCars">Se och boka bilar</a></li>
+            <li><a href="">Hantera användare</a></li>
+                <!-- PUT o GET via ID för användare-->
+            <li><a href="">Hämta en specifik bil</a></li>
+                <li><a href="">Kolla dina bokningar</a></li>
+        </ul>
+    </div>
+    <div class="headerRight"></div>
+</header>
     
 
     <div id="loggInDiv" class="hidden">
@@ -230,11 +245,12 @@
                 <th>Pris</th>
                 <th>Bokad?</th>
                 <th>Bild</th>
+                <th>Knappar</th>
             </tr>
         </thead>
         <tbody id="carTableBody">
             <tr>
-                <td colspan="5"></td>
+                <td colspan="9"></td>
             </tr>
         </tbody>
     </table>
@@ -260,11 +276,27 @@
             <p id="getACarMsg"></p>
         </form>
     </div>
+<div id="bookBtn" class="hidden">
+    <button class="bookingBtn">Gå till bokning</button>
+</div>
+    <div id="createBookingDiv" class="hidden">
+        <form id="createBookingForm">
+            <h2>Boka din biluthyrning</h2>
+            <h3 id="bookingCarName"></h3>
+            <input type="hidden" id="bookingCarId">
+            <label for="createFromDate">Boka från datumet:</label>
+            <input type="date" id="createFromDate" name="createFromDate">
+            <label for="createToDate">Boka till datum:</label>
+            <input type="date" id="createToDate" name="createToDate">
+            <button type="submit" id="createBookBtn">Spara bokning</button>
+        </form>
+        <p id="createBooking"></p>
+    </div>
 
 
 <footer class="commercial">
     <div class="commercialText"> <p>Reklamplatser</p></div>
-    <div id="middleFoot"><img src="blueCar.jfif" alt="Bild på blå bil"></div>
+    <div id="middleFoot"><img src="blueCar.jfif" alt="Bild på blå bmw"></div>
     <div id="rightFoot">Hyr bilen här</div>
    
     

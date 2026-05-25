@@ -9,7 +9,7 @@ const username = "user";
 function hideAllSections() {
     const sections = ["loggInDiv", "createAccount", "getAllUsers", "updatePutUser", 
         "deleteUser", "getUser", "getAllCars", "getACar", "deleteCar",
-    "createCarDiv"];
+    "createCarDiv", "createBookingDiv", "bookBtn"];
     sections.forEach(id => {
         const element = document.getElementById(id);
         if (element) element.classList.add("hidden");
@@ -112,6 +112,7 @@ fetch(url, {
     validationLoggIn.innerHTML = JSON.stringify(data);
     loggInAttempts = 0;
     logEvent("Användaren har loggat in.");
+    localStorage.setItem("isLoggedIn", "true");
     //Ska man skicka användaren till en annan sida efter inloggning?
 
 const loggInForm = document.getElementById("loggInForm");
@@ -120,13 +121,16 @@ navContainer.style.display = "none";
 const isAdmin = data.isAdmin;
 if (isAdmin === true) {
     console.log(data);   //Kolla vad som kommer
+    localStorage.setItem("isAdmin", "true");
     document.getElementById("adminNav").classList.remove("hidden");
     document.getElementById("header1").classList.add("hidden");
-    //document.getElementById("userMenu").classList.add("hidden");     //Ändra till användarmenyn
+    document.getElementById("userHeader").classList.add("hidden");     //Ändra till användarmenyn
 }
 else {
+    localStorage.setItem("isAdmin", "false");
+    document.getElementById("header1").classList.add("hidden");
     document.getElementById("adminNav").classList.add("hidden");
-    //document.getElementById("userMenu").classList.remove("hidden");  
+    document.getElementById("userHeader").classList.remove("hidden");  
 }
 })
 
@@ -579,6 +583,23 @@ return response.json().then((data) => {
         if (car.image) {
             imageSrc = `data:image/jpeg;base64,${car.image}`;
         }
+        const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+        const isAdmin = localStorage.getItem("isAdmin") === "true";
+        let actionButtons = "";
+        if (!isLoggedIn) {
+            actionButtons = `<span class="login">Logga in för att boka</span>`;
+        }
+        else if (isAdmin === true) {
+             actionButtons = `
+            <button class="btn-edit" onclick="editCar(${car.id})">Redigera</button>
+            <button class="btn-delete" onclick="deleteCar(${car.id})">Ta bort</button>
+        `;
+        }
+        else {
+             actionButtons = `
+            <button class="btn-book" onclick="bookCar(${car.id}, '${car.name} ${car.model}')">Boka direkt</button>
+        `;
+        }
             const row = document.createElement("tr"); 
             row.innerHTML = `
             <td>${car.id}</td>
@@ -589,10 +610,43 @@ return response.json().then((data) => {
             <td>${car.price} kr</td>
             <td>${car.booked}</td>
             <td><img src="${imageSrc}" alt="${car.name}" class="table-car-img"></td>
-            <td>
-            <button id="deleteCarBtn">Ta Bort</button>
-            </td>
+            <td class="action-cell"></td>
             `;
+            const actionCell = row.querySelector(".action-cell");
+             // 3. Skapa knapparna dynamiskt och lägg till addEventListener baserat på roll
+    if (!isLoggedIn) {
+        actionCell.innerHTML = `<span class="login">Logga in för att boka</span>`;
+    } 
+    else if (isAdmin === true) {
+        // Skapa Admin-knappar (Redigera / Ta bort)
+        const deleteBtn = document.createElement("button");
+        deleteBtn.textContent = "Ta bort";
+        deleteBtn.className = "btn-delete"; // Använd klass istället för ID
+        
+        // Här kopplar du din separata addEventListener för just denna bils radering
+        deleteBtn.addEventListener("click", (event) => {
+            event.preventDefault();
+            deleteCar(car.id); // Den vet exakt vilket ID som raderas tack vare loopen!
+        });
+
+        actionCell.appendChild(deleteBtn);
+    } 
+    else {
+        // Skapa din bokningsknapp för vanliga användare
+        const bookBtn = document.createElement("button");
+        bookBtn.textContent = "Boka direkt";
+        bookBtn.className = "btn-book"; // Använd klass istället för ID
+
+        // Här kopplar du din separata addEventListener för just denna bils bokning
+        bookBtn.addEventListener("click", (event) => {
+            event.preventDefault();
+            
+            // Här kör du din logik för att skicka kunden vidare till formuläret
+            bookCar(car.id, `${car.name} ${car.model}`);
+        });
+
+        actionCell.appendChild(bookBtn);
+    }
             carTableBody.appendChild(row);
         });
     })
@@ -667,13 +721,13 @@ function deleteCar() {
         if(data === null) throw new Error("Inget returneras");
         deleteCarMsg.textContent = "Bilen har tagits bort!"
         deleteCarMsg.style.color = "green";
-        document.getElementById("deleteCarForm");
+        document.getElementById("deleteCarForm").reset();
     })
     .catch((error) => {
         console.error("Error:", error);
         deleteCarMsg.textContent = "Gick inte att radera. Försök igen senare.";
         deleteCarMsg.style.color = "red";
-         document.getElementById("deleteCarForm");
+         document.getElementById("deleteCarForm").reset();
     });
 }
 
@@ -749,3 +803,52 @@ window.onclick = function(event) {
     }  
   }  
 } 
+
+//Bokningar Boka
+
+function bookCar(carId, carName) {
+    const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+    const isAdmin = localStorage.getItem("isAdmin") === "true";
+
+    if (!isLoggedIn || isAdmin === true) {
+        alert("Endast registrerade kunder kan boka bilar. Administratörer kan inte boka.");
+        return;
+}
+const tableSection = document.querySelector(".getAllCars");
+    if (tableSection) tableSection.classList.add("hidden");
+
+    const createBookingDiv = document.getElementById("createBookingDiv");
+    if (createBookingDiv) createBookingDiv.classList.remove("hidden");
+
+    document.getElementById("bookingCarName").textContent = carName;
+    document.getElementById("bookingCarId").value = carId;
+}
+//klicka boka bil från bilarna
+const bookBtn = document.getElementById("bookBtn");
+ if (bookBtn) {
+        bookBtn.addEventListener("click", (event) => {
+            event.preventDefault();
+            const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+            const isAdmin = localStorage.getItem("isAdmin") === "true";
+
+            if (!isLoggedIn) {
+                alert("Du måste logga in som kund för att kunna boka en bil.");
+                return;
+            }
+
+            if (isAdmin === true) {
+                alert("Administratörer kan inte boka bilar. Logga in med ett kundkonto.");
+                return;
+            }
+
+            const tableSection = document.querySelector(".getAllCars");
+            if (tableSection) {
+                tableSection.classList.add("hidden");
+            }
+            const createBookingDiv = document.getElementById("createBookingDiv");
+            if (createBookingDiv) {
+                createBookingDiv.classList.remove("hidden");
+            }
+            console.log("Användaren skickades vidare till bokningsformuläret.");
+        });
+    }

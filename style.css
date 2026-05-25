@@ -29,6 +29,10 @@ max-height: 50px;
     justify-content: flex-end;
     flex: 1;
 }
+#startPage {
+    padding: 30px;
+    margin: 80px;
+}
 #header1 {
 display: flex;
     justify-content: space-between;
@@ -50,7 +54,7 @@ display: flex;
     list-style-type: none; 
     overflow: hidden; 
     display: flex;
-    li { float: left; 
+    li {
         flex-direction: column; 
         border-right: 1px solid rgb(23, 23, 63); 
     } li a { display: block; 
@@ -67,8 +71,55 @@ display: flex;
         display: flex;
         justify-content: center;
     }
-   
-    .commercial {
+#userHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;           
+    position: fixed;               
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: lightgrey;   
+    padding: 0 20px;
+    box-sizing: border-box;
+    z-index: 1000;
+}  
+ #userMenuCenter {
+         flex: 2;
+        display: flex;
+        justify-content: center;
+    }
+.userNavClass {
+     background-color:lightgrey; 
+    text-decoration: none; 
+    margin: 0; 
+    padding: 0; 
+    list-style-type: none; 
+    overflow: hidden; 
+    display: flex;
+    li { 
+        flex-direction: column; 
+        border-right: 1px solid rgb(23, 23, 63); 
+    } li a { display: block; 
+        color: rgb(23, 23, 63); 
+        text-align: center; 
+        padding: 14px 16px; 
+        text-decoration: none; } 
+        li a:hover { background-color: rgb(170, 166, 166); } 
+        li:last-child { border-right: none; 
+        } 
+}
+.logoUserContainer {
+flex: 1;
+display: flex;
+justify-content: flex-start;
+}
+.logoUserContainer img {
+height: auto;
+width: 100px;
+max-height: 50px;
+}
+.commercial {
         bottom: 0;
         position: fixed;
         width: 100%;
