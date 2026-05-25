@@ -566,18 +566,42 @@ return response.json().then((data) => {
         return response.json();
     })
     .then((cars) => {
-        const carList = document.getElementById("carList");
-        carList.innerHTML = "";
+        console.log("bilddata: ", cars[0]);
+        const carTableBody = document.getElementById("carTableBody");
+        carTableBody.innerHTML = "";
 
+        if(cars.length ===0) {
+            carTableBody.innerHTML = `<tr><td colspan="9">Inga bilar tillgängliga</td></tr>`;
+        return;
+        }
         cars.forEach((car) => { 
-            const li = document.createElement("li"); 
-            li.textContent = `${car.name}, ${car.model}, ${car.feature1}, ${car.feature2}, 
-            ${car.feature3}, ${car.type}, ${car.price}. ID: ${car.id}`;
-            carList.appendChild(li);
+            let imageSrc = "";
+        if (car.image) {
+            imageSrc = `data:image/jpeg;base64,${car.image}`;
+        }
+            const row = document.createElement("tr"); 
+            row.innerHTML = `
+            <td>${car.id}</td>
+            <td>${car.name}</td>
+            <td>${car.model}</td>
+            <td>${car.type}</td>
+            <td>${car.feature1}, ${car.feature2}, ${car.feature3}</td>
+            <td>${car.price} kr</td>
+            <td>${car.booked}</td>
+            <td><img src="${imageSrc}" alt="${car.name}" class="table-car-img"></td>
+            <td>
+            <button id="deleteCarBtn">Ta Bort</button>
+            </td>
+            `;
+            carTableBody.appendChild(row);
         });
     })
     .catch((error) => {
         console.error("Error:", error);
+        const carTableBody = document.getElementById("carTableBody");
+        if(carTableBody) {
+            carTableBody.innerHTML = `<tr><td colspan="8" style="color: red;">Kunde inte hämta bilar.</td></tr>`;
+        }
     });
 }
 
