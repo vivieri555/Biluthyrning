@@ -791,41 +791,67 @@ if (getACarLink) {
     });
 }
 
-const getACarBtn = document.getElementById("getACarBtn");
-if(getACarBtn) {
-    getACarBtn.addEventListener("click", (event) => {
+const getACarUserLink = document.getElementById("getACarUserLink");
+if (getACarUserLink) {
+    getACarUserLink.addEventListener("click", function(event) {
         event.preventDefault();
-        getACar();
-});
+        hideAllSections();
+       const targetDiv = document.getElementById("getACarUser");
+        if (targetDiv) {
+            targetDiv.classList.remove("hidden");
+        }
+    });
 }
 
-function getACar() {
-    const carId = document.getElementById("getACarId").value;
-const getACarMsg = document.getElementById("getACarMsg");
-const url = `http://localhost:8080/api/v1/cars/${carId}`;
-const data = {
-    id: carId
-}
+function getACar(carId, carForm, carMsg) { 
+const url = `http://localhost:8080/api/v1/cars/${carId}`; 
+ 
+fetch(url, { 
+    method: "GET", 
+    credentials: "include" 
 
-fetch(url, {
-    method: "GET",
-    credentials: "include"
-})
-.then((response) => {
-    if(!response.ok) throw new Error("Fel vid hämtning av bil");
-    return response.json();
-})
-.then((car) => {
-    getACarMsg.textContent = `Bilen: ${car.name}, ${car.brand}, ${car.feature1}, ${car.feature2}, 
-            ${car.feature3}, ${car.type}, ${car.price}. ID: ${car.id}`;
-            document.getElementById("getACarForm").reset();
-})
-.catch((error) => {
-    console.error("Fel:", error);
-    document.getElementById("getACarForm").reset();
-});
-}
+}) 
+.then((response) => { 
+    if(!response.ok) throw new Error("Fel vid hämtning av bil"); 
+    return response.json(); 
+}) 
+.then((car) => { 
+    carMsg.textContent = `Bilen: ${car.name}, ${car.brand}, ${car.feature1}, ${car.feature2},  
+            ${car.feature3}, ${car.type}, ${car.price}. ID: ${car.id}`; 
+    const form = document.getElementById(carForm);
+    if (form) form.reset();
+}) 
+.catch((error) => { 
+    console.error("Kunde inte hitta bilen, fel: ", error); 
+    const form = document.getElementById(carForm);
+    if (form) form.reset();
+}); 
+} 
 
+// hämta bil user meny
+const getACarFormUser = document.getElementById("getACarFormUser");
+if (getACarFormUser) { 
+getACarFormUser.addEventListener("submit", function(event) { 
+    event.preventDefault(); 
+
+    const getACarMsg2 = document.getElementById("getACarMsg2"); 
+    getACarMsg2.textContent = "";  
+const id = document.getElementById("getACarId2").value; 
+    getACar(id, "getACarFormUser", getACarMsg2); 
+}); 
+}
+//hämta bil admin meny
+const getACarForm = document.getElementById("getACarForm");
+if(getACarForm) { 
+getACarForm.addEventListener("submit", function(event) { 
+    event.preventDefault(); 
+
+    const getACarMsg = document.getElementById("getACarMsg"); 
+    getACarMsg.textContent = ""; 
+const id = document.getElementById("getACarId").value; 
+    getACar(id, "getACarForm", getACarMsg); 
+}); 
+}
 //Funktion för bil dropdownmenyn i adminpanelen 
 const carAdminBtn = document.getElementById("carAdminBtn"); 
 if (carAdminBtn) { 

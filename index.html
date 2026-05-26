@@ -76,7 +76,7 @@
             <li><a href=".getAllCars">Se och boka bilar</a></li>
             <li><a href="">Hantera användare</a></li>
                 <!-- PUT o GET via ID för användare-->
-            <li><a href="">Hämta en specifik bil</a></li>
+            <li><a href="#getACarUser" id="getACarUserLink">Hämta en specifik bil</a></li>
                 <li><a href="">Kolla dina bokningar</a></li>
         </ul>
     </div>
@@ -274,6 +274,15 @@
             <p id="getACarMsg"></p>
         </form>
     </div>
+    <div id="getACarUser" class="hidden">
+<h2>Hämta specifik bil</h2>
+<form id="getACarFormUser">
+     <label for="getACarId2">Ange bilens id:</label>
+            <input type="text" id="getACarId2" name="getACarId2">
+            <button id="getACarBtn2">Hämta</button>
+            <p id="getACarMsg2"></p>
+</form>
+    </div> 
 <div id="bookBtn" class="hidden">
     <button class="bookingBtn">Gå till bokning</button>
 </div>
