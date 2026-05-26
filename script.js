@@ -112,7 +112,12 @@ fetch(url, {
     validationLoggIn.innerHTML = JSON.stringify(data);
     loggInAttempts = 0;
     logEvent("Användaren har loggat in.");
+    const username = usernameInput.value;
+const password = passwordInput.value;
+const basicAuthString = btoa(`${username}:${password}`);
     localStorage.setItem("isLoggedIn", "true");
+    localStorage.setItem("customerId", data.id);
+    localStorage.setItem("basicAuth", basicAuthString);
     //Ska man skicka användaren till en annan sida efter inloggning?
 
 const loggInForm = document.getElementById("loggInForm");
@@ -790,7 +795,7 @@ if (carAdminBtn) {
     }; 
 }  
 
-//toggla mellan att visa o ta bort menyn visuellt 
+//toggla mellan att visa o ta bort menyn visuellt för bilmenyn i admin
 window.onclick = function(event) {  
   if (!event.target.matches('#carAdminBtn')) {  
     var dropdowns = document.getElementsByClassName("dropdown-content");  
@@ -852,3 +857,66 @@ const bookBtn = document.getElementById("bookBtn");
             console.log("Användaren skickades vidare till bokningsformuläret.");
         });
     }
+
+document.getElementById("createBookingForm").addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    let headersPostBooking = new Headers();
+headersPostBooking.append("Content-Type", "application/json");
+headersPostBooking.append("Accept", "application/json");
+    
+    const bookingCarId = document.getElementById("bookingCarId").value; 
+    const createFromDate = document.getElementById("createFromDate").value; 
+    const createToDate = document.getElementById("createToDate").value; 
+    const basicAuth = localStorage.getItem("basicAuth");
+    const customerId = localStorage.getItem("customerId");
+
+    if (new Date(createFromDate) > new Date(createToDate)) {
+        alert("Slutdatum kan inte vara före startdatum.");
+        return;
+    }
+    
+    const formData = {
+        carId: parseInt(bookingCarId),
+        fromDate: createFromDate,
+        toDate: createToDate,
+        userId: parseInt(customerId)
+    };
+     if (basicAuth) {
+        headersPostBooking.append("Authorization", `Basic ${basicAuth}`);
+    }
+
+    try {
+        const url = "http://localhost:8080/api/v1/bookings";
+        const response = await fetch(url, {
+            method: "POST",
+            headers: headersPostBooking,
+            body: JSON.stringify(formData),
+            mode: "cors"
+        });
+
+        if (response.ok) {
+            alert("Bokning sparats!");
+            document.getElementById("createBookingForm").reset();
+            document.getElementById("createBookingDiv").classList.add("hidden");
+            document.querySelector(".getAllCars").classList.remove("hidden");
+        } else {
+            const contentType = response.headers.get("content-type");
+            if (contentType && contentType.includes("application/json")) {
+                const errorData = await response.json();
+                alert(`Kunde inte boka: ${errorData.error || "Okänt fel"}`);
+            }
+                else {
+                alert(`Kunde inte boka: Servern svarade med status ${response.status}`);
+                }
+            }
+        }
+    catch (error) {
+        console.error("Fel med kommunikationen, försök igen senare", error);
+    }
+});
+
+document.getElementById("cancelBookingBtn").addEventListener("click", () => {
+    document.getElementById("createBookingDiv").classList.add("hidden");
+    document.querySelector(".getAllCars").classList.remove("hidden");
+});

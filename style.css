@@ -308,3 +308,16 @@ background-color: #ddd;
         background-color: rgb(239, 241, 240);
     }
 }
+.getAllCars {
+    margin: 50px;
+    margin-left: 100px;
+}
+.standardBtn {
+    border: solid 1px rgb(23, 23, 63);
+    border-radius: 5px;
+    color: rgb(23, 23, 63);
+    padding: 10px;
+    text-align: center;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    font-weight: bold;
+}
