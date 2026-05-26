@@ -5,9 +5,10 @@ const validationLoggIn = document.getElementById("validationLoggIn");
 let loggInAttempts = 0; 
 const password = "user";
 const username = "user";
+const basicAuth = btoa('${username}:${password}'); //koda användarnamn och lösenord i Base64 
 
 function hideAllSections() {
-    const sections = ["loggInDiv", "createAccount", "getAllUsers", "updatePutUser", 
+    const sections = ["loggInDiv", "createAccount", "createAccount2", "getAllUsers", "updatePutUser", 
         "deleteUser", "getUser", "getAllCars", "getACar", "deleteCar",
     "createCarDiv", "createBookingDiv", "bookBtn"];
     sections.forEach(id => {
@@ -20,18 +21,18 @@ function logEvent(message) {
     const timestamp = new Date().toLocaleString();
     console.log(`[${timestamp}] ${message}`);
 }
-//Skapa konto
+//Skapa konto för vanlig user
 document.getElementById("createAccountForm").addEventListener("submit", function(event) {
     event.preventDefault();
 
     const username = document.getElementById("createUsername").value;
     const password = document.getElementById("createPassword").value;
-    const first_name = document.querySelector("input[name='first_name']").value;
-    const last_name = document.querySelector("input[name='last_name']").value;
-    const phone = document.querySelector("input[name='phone']").value;
-    const email = document.querySelector("input[name='email']").value;
+    const first_name = document.getElementById("first_name").value;
+    const last_name = document.getElementById("last_name").value;
+    const phone = document.getElementById("phone").value;
+    const email = document.getElementById("email").value;
     const no_of_orders = 0;
-    const role = document.querySelector("input[name='role']").value;
+    const role = "";
     const createMsg = document.getElementById("createMsg");
     createMsg.textContent = "";
 
@@ -42,10 +43,16 @@ document.getElementById("createAccountForm").addEventListener("submit", function
         lastName: last_name,
         phone: phone,
         email: email,
-        noOfOrders: no_of_orders,
-        role: role
-    }
-    fetch("http://localhost:8080/api/v1/users", {
+        noOfOrders: 0,
+        role: ""
+    };
+
+    sendUserToApi(newUser, "createAccountForm", createMsg);
+});
+//metoden för båda fetch skapa konto
+function sendUserToApi(newUser, formId, messageElement) {
+    const url = "http://localhost:8080/api/v1/users";
+fetch(url, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -54,7 +61,7 @@ document.getElementById("createAccountForm").addEventListener("submit", function
         credentials: "include"
 })
 .then(function(response) {
-    if (response === 204 || response.headers.get("Content-Type") === "0") {
+    if (response.status === 204 || response.headers.get("Content-Type") === "0") {
              return { status: response.ok, data: {} };
          }
     return response.json().then(function(data) {
@@ -64,25 +71,56 @@ document.getElementById("createAccountForm").addEventListener("submit", function
 .then(function(result) {
     if (result.status) {
         alert("Konto sparat!");
-        document.getElementById("createAccountForm").reset();
+        document.getElementById(formId).reset();
     } else {
-        createMsg.textContent = result.data.message || "Misslyckades att spara konto.";
+        messageElement.textContent = result.data.message || "Misslyckades att spara konto.";
     }
 })
 .catch(function(error) {
     console.error("Error:", error);
-    createMsg.textContent = "Ett fel inträffade. Försök igen senare.";
+    messageElement.textContent = "Ett fel inträffade. Försök igen senare.";
 });
 }
-);
+    
+const createAccount2Link = document.querySelector('a[href="#createAccount2"]');
+if (createAccount2Link) {
+    createAccount2Link.addEventListener("click", function(event) {
+        event.preventDefault();
+        hideAllSections();
+        const targetDiv = document.getElementById("createAccount2");
+        if (targetDiv) {
+            targetDiv.classList.remove("hidden");
+        }
+        document.getElementById("myDropdown").classList.remove("show");
+    });
+}
+
+//Skapa konto för admin
+document.getElementById("createAccountForm2").addEventListener("submit", function(event) {
+    event.preventDefault();
+
+    const createMsg2 = document.getElementById("createMsg2");
+    createMsg2.textContent = "";
+
+    const newUser = {
+        username: document.getElementById("createUsername2").value,
+        password: document.getElementById("createPassword2").value,
+        firstName: document.getElementById("first_name2").value,
+        lastName: document.getElementById("last_name2").value,
+        phone: document.getElementById("phone2").value,
+        email: document.getElementById("email2").value,
+        noOfOrders: 0,
+        role: document.getElementById("role2").value
+    };
+
+    sendUserToApi(newUser, "createAccountForm2", createMsg2);
+});
 
 loggInForm.addEventListener("submit", function(event) {
     event.preventDefault();
     validationLoggIn.textContent = "";
     postLogIn();
 });
-
-const basicAuth = btoa('${username}:${password}'); //koda användarnamn och lösenord i Base64 
 
 
 let headersPost = new Headers(); 
@@ -446,6 +484,7 @@ if (loginLink) {
         if (loggInDiv) {
             loggInDiv.classList.remove("hidden");
             document.getElementById("startPage").classList.add("hidden");
+            document.querySelector(".getAllCars").classList.add("hidden");
         }
     });
 }
@@ -459,6 +498,7 @@ if (createAccountLink) {
         if(createDiv) {
             createDiv.classList.remove("hidden");
             document.getElementById("startPage").classList.add("hidden");
+            document.querySelector(".getAllCars").classList.add("hidden");
         }
     });
 }
