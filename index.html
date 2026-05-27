@@ -11,10 +11,9 @@
 </head>
 <body>
 
-<header id="header1">
+<div id="header1">
 <div class="logoLogIn"><img src="KoncernensLogga.png" alt="Wigellkoncernens Biluthyrning Logga">
         </div>
-
     <div id="navigation">
  <nav id="navContainer">
 <ul class="navClass">
@@ -25,7 +24,7 @@
 </nav>
     </div>
     <div class="headerRight"></div>
-</header>
+</div>
      
 <div id="startPage">
     <h2>Välkommen till Wigellkoncernens Biluthyrning</h2>
@@ -33,19 +32,19 @@
     <h3>Logga in eller skapa ett konto för att komma igång</h3>
 </div>
     
-<header id="adminNav" class="adminNavContainer hidden">
+<div id="adminNav" class="adminNavContainer hidden">
     <div class="logoHeaderContainer">
         <img src="KoncernensLogga.png" alt="Wigellkoncernens Biluthyrning Logga">
     </div>
     <div id="adminMenuCenter">
-    <ul class="adminNavClass" id="adminMenu">
-                
+    <ul class="adminNavClass" id="adminMenu"> 
                 <li class="dropdownCarAdminMenu">
                     <button id="carAdminBtn">Hantera Bilar</button>
                     <div id="CarAdminDivDrop" class="dropdown-content">
                         <a href=".getAllCars">Se alla Bilar</a>
                         <a href="#createCarDiv">Skapa ny bil</a>
                         <a href="#getACar">Hämta specifik bil</a>
+                        <a href="#updateCarDiv">Ändra på en befintlig bil</a>
                         <a href="#deleteCar">Radera bil</a>
                     </div>
                 </li>
@@ -60,28 +59,30 @@
     <a href="#getUser">Hämta specifik användare</a>
   </div> 
 </li>
-                <li><a href="#">Bokningar</a></li>
-                <li><a href="#">Logga ut?</a></li>
+        <li><a href="#">Bokningar</a></li>
+        <li><a href="#">Logga ut?</a></li>
             </ul>
     </div>
 <div class="headerRight"></div>
-    </header>
+</div>
     
-<header id="userHeader" class="hidden">
+<div id="userHeader" class="hidden">
       <div class="logoUserContainer">
         <img src="KoncernensLogga.png" alt="Wigellkoncernens Biluthyrning Logga">
     </div>
     <div id="userMenuCenter">
         <ul class="userNavClass">
-            <li><a href=".getAllCars">Se och boka bilar</a></li>
+            <li><a href="#getAllCars" id="getAllCarsUserLink">Se och boka bilar</a></li>
             <li><a href="">Hantera användare</a></li>
                 <!-- PUT o GET via ID för användare-->
+                 <li><a href="">Uppdatera din profil</a></li>
             <li><a href="#getACarUser" id="getACarUserLink">Hämta en specifik bil</a></li>
-                <li><a href="">Kolla dina bokningar</a></li>
+                <li><a href="#myBookings" id="myBookingsLink">Se dina bokningar</a></li>
+                <li><a href="">Hämta en enskild bokning med id</a></li>
         </ul>
     </div>
     <div class="headerRight"></div>
-</header>
+</div>
     
 
     <div id="loggInDiv" class="hidden">
@@ -135,6 +136,44 @@
         <p id="updateMsg"></p>
         </form>
     </div>
+
+<div id="updateCarDiv" class="hidden">
+<h2>Vilken bil vill du uppdatera? Ange bilens id</h2>
+<form id="updateCar1">
+     <label for="updateCarId1">Ange bilens id:</label>
+            <input type="text" id="updateCarId1" name="updateCarId1">
+            <button id="updateCar1Btn">Hämta</button>
+            <p id="updateCar1Msg"></p>
+</form>
+    </div> 
+    <div id="updateCar" class="hidden"> 
+<h2>Uppdatera en befintlig bil</h2> 
+
+<form id="updateCarForm"> 
+<label for="updateCarId">Bilens id:</label> 
+<input type="text" id="updateCarId" name="updateCarId">
+<label for="updateCarName">Namn:</label>
+<input type="text" id="updateCarName" name="updateCarName"> 
+<label for="updateModel">Modell:</label> 
+<input type="text" id="updateModel" name="updateModel"> 
+<label for="updateCarPrice">Pris:</label> 
+<input type="number" id="updateCarPrice" name="updateCarPrice"> 
+
+<label for="updateType">Typ av bil:</label> 
+<input type="text" id="updateType" name="updateType"> 
+<label for="updateFeature1">Feature 1: </label> 
+<input type="text" id="updateFeature1" name="updateFeature1"> 
+<label for="updateFeature2">Feature 2: </label> 
+<input type="text" id="updateFeature2" name="updateFeature2"> 
+<label for="updateFeature3">Feature 3: </label> 
+<input type="text" id="updateFeature3" name="updateFeature3"> 
+<label for="updateBooked">Bokad: </label> 
+<input type="text" id="updateBooked" name="updateBooked"> 
+
+<button id="updateCarBtn">Uppdatera </button> 
+<p id="updateCarMsg"></p> 
+</form> 
+</div> 
 
     <!-- Radera användare metod-->
 <div id="deleteUser" class="hidden">
@@ -227,9 +266,8 @@
         <p id="createCarMsg"></p>
     </div>
 
-    <div class="getAllCars hidden">
+    <div id="getAllCars" class="getAllCars hidden">
 <h2>Se vilka bilar som finns</h2>
-<ul id="carList"></ul>
 <p id="getAllCarsMsg"></p>
 <div class="carTable">
     <table>
@@ -299,6 +337,30 @@
             <button type="button" id="cancelBookingBtn">Avbryt</button>
         </form>
         <p id="createBooking"></p>
+    </div>
+
+    <div id="myBookings" class="hidden">
+        <h3>Här kan du se alla dina bokningar</h3>
+        <ul id="myBookingsList"></ul>
+        <p id="myBookingsMsg"></p>
+        <div class="myBookingsTable">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Bokningsid</th>
+                        <th>Bokat från datum</th>
+                        <th>Bokat till datum</th>
+                        <th>Bilens id</th>
+                        <th>Aktiv bokning</th>
+                    </tr>
+                </thead>
+                <tbody id="bookingsTableBody">
+                    <tr>
+                        <td colspan="5"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
 

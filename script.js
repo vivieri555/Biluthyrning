@@ -10,7 +10,7 @@ const basicAuth = btoa('${username}:${password}'); //koda användarnamn och lös
 function hideAllSections() {
     const sections = ["loggInDiv", "createAccount", "createAccount2", "getAllUsers", "updatePutUser", 
         "deleteUser", "getUser", "getAllCars", "getACar", "deleteCar",
-    "createCarDiv", "createBookingDiv", "bookBtn"];
+    "createCarDiv", "createBookingDiv", "bookBtn", "myBookings", "getACarUser", "getAllCarsUserLink"];
     sections.forEach(id => {
         const element = document.getElementById(id);
         if (element) element.classList.add("hidden");
@@ -156,7 +156,6 @@ const basicAuthString = btoa(`${username}:${password}`);
     localStorage.setItem("isLoggedIn", "true");
     localStorage.setItem("customerId", data.id);
     localStorage.setItem("basicAuth", basicAuthString);
-    //Ska man skicka användaren till en annan sida efter inloggning?
 
 const loggInForm = document.getElementById("loggInForm");
 loggInForm.style.display = "none";
@@ -167,7 +166,7 @@ if (isAdmin === true) {
     localStorage.setItem("isAdmin", "true");
     document.getElementById("adminNav").classList.remove("hidden");
     document.getElementById("header1").classList.add("hidden");
-    document.getElementById("userHeader").classList.add("hidden");     //Ändra till användarmenyn
+    document.getElementById("userHeader").classList.add("hidden");
 }
 else {
     localStorage.setItem("isAdmin", "false");
@@ -239,7 +238,7 @@ if (getAllUsersBtn) {
     });
 }
 
-//Hämta alla användare, ADMIN o user
+//Hämta alla användare
 function getAllUsers() {
     const url = "http://localhost:8080/api/v1/users";
 fetch(url, {
@@ -296,7 +295,6 @@ const fields = {
         }
     }
 
-    // Om något saknas använder vi ?.value så att koden inte kraschar med rött fel
     const userId = document.getElementById("updateUserId")?.value || "";
     const first_name = document.getElementById("updateFirstName")?.value || "";
     const last_name = document.getElementById("updateLastName")?.value || "";
@@ -663,15 +661,13 @@ return response.json().then((data) => {
         actionCell.innerHTML = `<span class="login">Logga in för att boka</span>`;
     } 
     else if (isAdmin === true) {
-        // Skapa Admin-knappar (Redigera / Ta bort)
+
         const deleteBtn = document.createElement("button");
         deleteBtn.textContent = "Ta bort";
-        deleteBtn.className = "btn-delete"; // Använd klass istället för ID
-        
-        // Här kopplar du din separata addEventListener för just denna bils radering
+        deleteBtn.className = "btn-delete";
         deleteBtn.addEventListener("click", (event) => {
             event.preventDefault();
-            deleteCar(car.id); // Den vet exakt vilket ID som raderas tack vare loopen!
+            deleteCar(car.id);
         });
 
         actionCell.appendChild(deleteBtn);
@@ -720,10 +716,10 @@ getAllCarsLink.forEach(function(link) {
         if (dropdown) {
             dropdown.classList.remove("show");
         }
-       
         getCars(); 
     });
 });
+
 const deleteCarLink = document.querySelector(`a[href="#deleteCar"]`);
 if(deleteCarLink) {
     deleteCarLink.addEventListener("click", (event) => {
@@ -802,6 +798,20 @@ if (getACarUserLink) {
         }
     });
 }
+
+const getAllCarsUserLink = document.getElementById("getAllCarsUserLink"); 
+
+if (getAllCarsUserLink) { 
+    getAllCarsUserLink.addEventListener("click", function(event) { 
+        event.preventDefault();  
+        hideAllSections(); 
+
+        const targetDiv = document.querySelectorAll(".getAllCars"); 
+        if (targetDiv) {  
+            targetDiv.classList.remove("hidden");  
+        } 
+    }); 
+} 
 
 function getACar(carId, carForm, carMsg) { 
 const url = `http://localhost:8080/api/v1/cars/${carId}`; 
@@ -885,7 +895,7 @@ function bookCar(carId, carName) {
         alert("Endast registrerade kunder kan boka bilar. Administratörer kan inte boka.");
         return;
 }
-const tableSection = document.querySelector(".getAllCars");
+const tableSection = document.querySelectorAll(".getAllCars");
     if (tableSection) tableSection.classList.add("hidden");
 
     const createBookingDiv = document.getElementById("createBookingDiv");
@@ -986,3 +996,85 @@ document.getElementById("cancelBookingBtn").addEventListener("click", () => {
     document.getElementById("createBookingDiv").classList.add("hidden");
     document.querySelector(".getAllCars").classList.remove("hidden");
 });
+
+//Hämta alla bokningar för inloggad användare
+function myBookings() {
+
+    const id = localStorage.getItem("customerId");
+    const basicAuth = localStorage.getItem("basicAuth");
+    const url = `http://localhost:8080/api/v1/bookings/me`;
+     let headersMyBooking = new Headers();
+    headersMyBooking.append("Content-Type", "application/json");
+    headersMyBooking.append("Accept", "application/json");
+    headersMyBooking.append("Authorization", `Basic ${basicAuth}`);
+    
+fetch(url, {
+    method: "GET",
+    mode: "cors",
+    credentials: "include",
+    headers: headersMyBooking
+})
+.then((response) => {   
+    if (response.status === 404) {
+            return [];
+        }
+    if (!response.ok) throw new Error("Något gick fel med att hämta bokning.");
+    return response.json();
+})
+.then((bookings) => {
+    const carTableBody = document.getElementById("carTableBody");
+
+    if (carTableBody) {
+            carTableBody.innerHTML = "";
+            if (!bookings || bookings.length === 0) {
+                carTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center;">Du har inga bokningar ännu.</td></tr>`;
+            return;
+            }
+
+    bookings.forEach((booking) => {
+
+        const row = document.createElement("tr");
+       const idCell = document.createElement("td");
+            idCell.textContent = booking.id;
+
+            const fromCell = document.createElement("td");
+            fromCell.textContent = booking.fromDate;
+
+            const toCell = document.createElement("td");
+            toCell.textContent = booking.toDate;
+
+            const carCell = document.createElement("td");
+            carCell.textContent = booking.carId;
+
+            const activeCell = document.createElement("td");
+            activeCell.textContent = booking.active ? "Ja" : "Nej";
+
+            // 3. Lägg till alla celler i raden
+            row.appendChild(idCell);
+            row.appendChild(fromCell);
+            row.appendChild(toCell);
+            row.appendChild(carCell);
+            row.appendChild(activeCell);
+
+            // 4. Tryck in den färdiga raden i tabellens tbody
+            carTableBody.appendChild(row);
+        });
+    }
+})
+.catch((error) => {
+    console.error("Gick inte att hämta bokningar:", error);
+});
+}
+
+const myBookingsLink = document.getElementById("myBookingsLink");
+if (myBookingsLink) {
+myBookingsLink.addEventListener("click", function(event) {
+    event.preventDefault();
+    hideAllSections();
+    const targetDiv = document.getElementById("myBookings");
+    if (targetDiv) {
+        targetDiv.classList.remove("hidden");
+    }
+myBookings();
+});
+}
