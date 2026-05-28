@@ -10,8 +10,7 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-<div id="header1">
+    <div id="header1">
 <div class="logoLogIn"><img src="KoncernensLogga.png" alt="Wigellkoncernens Biluthyrning Logga">
         </div>
     <div id="navigation">
@@ -25,13 +24,7 @@
     </div>
     <div class="headerRight"></div>
 </div>
-     
-<div id="startPage">
-    <h2>Välkommen till Wigellkoncernens Biluthyrning</h2>
-    <h3>Här finns många trevliga bilar att hyra!</h3>
-    <h3>Logga in eller skapa ett konto för att komma igång</h3>
-</div>
-    
+
 <div id="adminNav" class="adminNavContainer hidden">
     <div class="logoHeaderContainer">
         <img src="KoncernensLogga.png" alt="Wigellkoncernens Biluthyrning Logga">
@@ -60,7 +53,7 @@
   </div> 
 </li>
         <li><a href="#">Bokningar</a></li>
-        <li><a href="#">Logga ut?</a></li>
+        <li><a href="#" class="logoutLink">Logga ut</a></li>
             </ul>
     </div>
 <div class="headerRight"></div>
@@ -79,10 +72,22 @@
             <li><a href="#getACarUser" id="getACarUserLink">Hämta en specifik bil</a></li>
                 <li><a href="#myBookings" id="myBookingsLink">Se dina bokningar</a></li>
                 <li><a href="">Hämta en enskild bokning med id</a></li>
+                <li><a href="#" class="logoutLink">Logga ut</a></li>
         </ul>
     </div>
     <div class="headerRight"></div>
 </div>
+
+<div id="main">
+
+     
+<div id="startPage">
+    <h2>Välkommen till Wigellkoncernens Biluthyrning</h2>
+    <h3>Här finns många trevliga bilar att hyra!</h3>
+    <h3>Logga in eller skapa ett konto för att komma igång</h3>
+</div>
+    
+
     
 
     <div id="loggInDiv" class="hidden">
@@ -146,9 +151,9 @@
             <p id="updateCar1Msg"></p>
 </form>
     </div> 
+
     <div id="updateCar" class="hidden"> 
 <h2>Uppdatera en befintlig bil</h2> 
-
 <form id="updateCarForm"> 
 <label for="updateCarId">Bilens id:</label> 
 <input type="text" id="updateCarId" name="updateCarId">
@@ -363,6 +368,7 @@
         </div>
     </div>
 
+</div>
 
 <footer class="commercial">
     <div class="commercialText"> <p>Reklamplatser</p></div>
@@ -374,6 +380,5 @@
 </footer>
 <p>&copy; 2023 Wigellkoncernens Biluthyrning. Alla rättigheter förbehållna.</p>
     <script src="script.js"></script>
-    <script src="usersScript.js"></script>
 </body>
 </html>
