@@ -52,10 +52,15 @@
     <a href="#getUser">Hämta specifik användare</a>
   </div> 
 </li>
-        <li><a href="#">Bokningar</a></li>
+<li class="dropdownAdminBookingMenu">
+    <button id="dropdownBookingBtn">Bokningar</button>
+    <div id="dropdownBookingsDiv" class="dropdown-content">
+         <li><a href="#getBookings">Se alla bokningar</a></li>
         <li><a href="#updateBooking">Uppdatera bokning</a></li>
-        <li><a href="#getBookings">Se alla bokningar</a></li>
-        <li><a href="#" class="logoutLink">Logga ut</a></li>
+         <li><a href="#">Bokningar</a></li>
+    </div>
+</li>
+ <li><a href="#" class="logoutLink">Logga ut</a></li>
             </ul>
     </div>
 <div class="headerRight"></div>
@@ -179,6 +184,39 @@
 
 <button id="updateCarBtn">Uppdatera </button> 
 <p id="updateCarMsg"></p> 
+</form> 
+</div> 
+
+<div id="updateBookingDiv" class="hidden">
+<h2>Vilken bokning vill du uppdatera? Ange id</h2>
+<form id="updateBookingForm2">
+     <label for="updateBookingId2">Ange bokningens id:</label>
+            <input type="text" id="updateBookingId2" name="updateBookingId2">
+            <button id="updateIdBookingBtn2">Hämta</button>
+            <p id="updateBookingMsg2"></p>
+</form>
+    </div> 
+
+    <div id="updateBooking" class="hidden"> 
+<h2>Uppdatera en befintlig bokning</h2> 
+<form id="updateBookingForm"> 
+<label for="updateBookingId">Bokningens id:</label> 
+<input type="text" id="updateBookingId" name="updateBookingId">
+<label for="updateBookingFromDate">Från vilket datum:</label>
+<input type="date" id="updateBookingFromDate" name="updateBookingFromDate"> 
+<label for="updateBookingToDate">Till vilket datum:</label> 
+<input type="date" id="updateBookingToDate" name="updateBookingToDate"> 
+<label for="updateBookingUserId">Kundens användarid:</label> 
+<input type="number" id="updateBookingUserId" name="updateBookingUserId"> 
+
+<label for="updateBookingCarId">Bilens id:</label> 
+<input type="number" id="updateBookingCarId" name="updateBookingCarId"> 
+<label for="updateBookingActive">Bokning aktiv: </label> 
+<input type="text" id="updateBookingActive" name="updateBookingActive"> 
+
+
+<button id="updateBookingBtn">Uppdatera </button> 
+<p id="updateBookingMsg"></p> 
 </form> 
 </div> 
 
@@ -309,13 +347,13 @@
         <table>
             <thead>
                 <tr>
-                    <th>Boknings-ID</th>
-                    <th>Från Datum</th>
-                    <th>Till Datum</th>
-                    <th>Användar-ID</th>
-                    <th>Bil-ID</th>
-                    <th>Status (Aktiv)</th>
-                    <th>Åtgärder</th>
+                    <th id="thBookingId">Boknings-ID</th>
+                    <th id="thFromDate">Från Datum</th>
+                    <th id="thToDate">Till Datum</th>
+                    <th id="thUserId">Användar-ID</th>
+                    <th id="thCarId">Bil-ID</th>
+                    <th id="thActive">Status (Aktiv)</th>
+                    <th id="thActionsBooking">Åtgärder</th>
                 </tr>
             </thead>
             <tbody id="bookingTableBody">

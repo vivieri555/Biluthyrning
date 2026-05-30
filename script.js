@@ -6,12 +6,14 @@ let loggInAttempts = 0;
 const password = "user";
 const username = "user";
 const basicAuth = btoa('${username}:${password}'); //koda användarnamn och lösenord i Base64 
+let currentCars = [];
+let sortDirections = { name: "asc", type: "asc" };
 
 function hideAllSections() {
     const sections = ["loggInDiv", "createAccount", "createAccount2", "getAllUsers", "updatePutUser", 
         "deleteUser", "getUser", "getAllCars", "getACar", "deleteCar",
     "createCarDiv", "createBookingDiv", "bookBtn", "myBookings", "getACarUser", "getAllCarsUserLink"
-, "updateCarDiv", "updateCar"];
+, "updateCarDiv", "updateCar", "getBookings", "updateBooking"];
     sections.forEach(id => {
         const element = document.getElementById(id);
         if (element) element.classList.add("hidden");
@@ -592,8 +594,7 @@ return response.json().then((data) => {
         createCarMsg.textContent = "Ett fel inträffade. Försök igen senare.";
     })
     });
-    let currentCars = [];
-    let sortDirections = { name: "asc", type: "asc" };
+
 
     //Hämta bil för alla
     let headersCarGet = new Headers();
@@ -1038,6 +1039,26 @@ window.onclick = function(event) {
     }  
   }  
 } 
+//funktion för admin bokningsmeny
+const dropdownBookingBtn = document.getElementById("dropdownBookingBtn");
+if (dropdownBookingBtn) {
+    dropdownBookingBtn.onclick = function(event) {
+        document.getElementById("dropdownBookingsDiv").classList.toggle("show");
+        event.stopPropagation();
+    };
+}
+window.onclick = function(event) {
+    if(!event.target.matches('#dropdownBookingBtn')) {
+        var dropdowns = this.document.getElementsByClassName("dropdown-content");
+        var i;
+        for (i = 0; i < dropdowns.length; i++) {
+            var openDropdown = dropdowns[i];
+            if (openDropdown.classList.contains('show')) {
+                openDropdown.classList.remove('show');
+            }
+        }
+    }
+}
 
 //Bokningar Boka
 
@@ -1150,6 +1171,156 @@ document.getElementById("cancelBookingBtn").addEventListener("click", () => {
     document.querySelector(".getAllCars").classList.remove("hidden");
 });
 
+//Länk hämta alla bokningar
+const getBookingsLink = document.querySelector('a[href="#getBookings"]');
+const getAllBookingsMsg = document.getElementById("getAllBookingsMsg");
+
+if(getBookingsLink) {
+    getBookingsLink.addEventListener("click", function(event) {
+        event.preventDefault();
+        hideAllSections();
+        const targetDiv = document.getElementById("getBookings");
+        if (targetDiv) {
+            targetDiv.classList.remove("hidden");
+        }
+        document.getElementById("dropdownBookingsDiv").classList.remove("show");
+        getAllBookings(); 
+    });
+}
+let currentBookings = [];
+//Hämta alla bokningar admin
+function getAllBookings() {
+    const basicAuth = localStorage.getItem("basicAuth");
+    const url = `http://localhost:8080/api/v1/bookings`;
+    let headersgetAllBookings = new Headers();
+    headersgetAllBookings.append("Content-Type", "application/json");
+    headersgetAllBookings.append("Accept", "application/json");
+    headersgetAllBookings.append("Authorization", `Basic ${basicAuth}`);
+
+    fetch(url, {
+        method: "GET",
+        mode: "cors",
+        credentials: "include",
+        headers: headersgetAllBookings
+    })
+    .then((response) => {
+        if (!response.ok) {
+            throw new Error(`Serverfel: `, response.json);
+        }
+        return response.json();
+    })
+    .then((bookings) => {
+        currentBookings = bookings;
+        createTableAllBookings(bookings);
+    })
+    .catch((error) => {
+        console.error("Fel: ", error);
+        const bookingTable = document.getElementById("bookingTableBody");
+        if (bookingTable) {
+            bookingTable.innerHTML = `<tr><td colspan="7" style="color: red;">Kunde inte hämta bokningar.</td></tr>`;
+        }
+    });
+}
+
+function createTableAllBookings (bookings) {
+    const bookingTable = document.getElementById("bookingTableBody");
+    bookingTable.innerHTML = "";
+
+    if(bookings.length === 0) {
+        bookingTable.innerHTML = `<tr><td colspan="7">Inga bokningar tillgängliga</td></tr>`;
+        return;
+    }
+
+    bookings.forEach((booking) => {
+const isAdmin = localStorage.getItem("isAdmin") === "true";
+    const row = document.createElement("tr");
+    row.innerHTML = `
+    <td>${booking.id}</td>
+    <td>${booking.fromDate}</td>
+    <td>${booking.toDate}</td>
+    <td>${booking.userId}</td>
+    <td>${booking.carId}</td>
+    <td>${booking.booked ? "Ja" : "Nej"}</td>
+    <td class="actions"></td>
+    `;
+    const actionsBook = row.querySelector(".actions");
+
+    const deleteBookingBtn = document.createElement("button");
+    deleteBookingBtn.textContent = "Radera bokning";
+    deleteBookingBtn.style.backgroundColor = "rgb(160, 25, 16)";
+    deleteBookingBtn.style.color = "white";
+    deleteBookingBtn.className = "deleteBookingBtn";
+    deleteBookingBtn.addEventListener("click", (event) => {
+        event.preventDefault();
+        if(confirm("Vill du verkligen radera bokning " + booking.id + "?")) {
+               
+        //lägga till metoden för att radera bokning delete(booking.id)
+        }
+    });
+    const updateBtn = document.createElement("button");
+    updateBtn.textContent = "Uppdatera";
+    updateBtn.addEventListener("click", (event) => {
+        event.preventDefault();
+        hideAllSections();
+        document.getElementById("updateBooking").classList.remove("hidden");
+        document.getElementById("").value = booking.id;     //lägg till i html
+        document.getElementById("updateBookingBtn").click();      //knapp för när de ska uppdatera sen
+    });
+    actionsBook.appendChild(deleteBookingBtn);
+    actionsBook.appendChild(updateBtn);
+    bookingTable.appendChild(row);
+    });
+    
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    const sortId = document.getElementById("thBookingId");
+    const sortFromDate = document.getElementById("thFromDate");
+    const sortToDate = document.getElementById("thToDate");
+    const sortUserId = document.getElementById("thUserId");
+    const sortCarId = document.getElementById("thCarId");
+    const sortActive = document.getElementById("thActive");
+
+    const sortColumn = [
+    {id: "thBookingId", field: "id"},
+    {id: "thFromDate", field: "fromDate"},
+    {id: "thToDate", field: "toDate"},
+    {id: "thUserId", field: "userId"},
+    {id: "thCarId", field: "carId"},
+    {id: "thActive", field: "active"},
+    ];
+sortColumn.forEach(col => {
+    const column = document.getElementById(col.id);
+    if (column) {
+        column.addEventListener("click", () => {
+            sortBookingsByField(col.field);
+        });
+    }
+});
+})
+
+//Sortera bokningar
+function sortBookingsByField(field) {
+    if (currentBookings.length === 0) return;
+
+    const direction = sortDirections[field] === "asc" ? "desc" : "asc";
+    sortDirections[field] = direction;
+
+    currentBookings.sort((a, b) => {
+        const valueA = (a[field] || "").toString();
+        const valueB = (b[field] || "").toString();
+
+        if(typeof valueA === "number" && typeof valueB === "number") {
+    return direction === "asc" ? valueA - valueB : valueB - valueA;
+        }
+
+        const comparison = valueA.localeCompare(valueB, "sv");
+        return direction === "asc" ? comparison : -comparison;
+    });
+
+    createTableAllBookings(currentBookings);
+}
+
 //Hämta alla bokningar för inloggad användare
 function myBookings() {
 
@@ -1175,12 +1346,12 @@ fetch(url, {
     return response.json();
 })
 .then((bookings) => {
-    const carTableBody = document.getElementById("carTableBody");
+    const bookingTable = document.getElementById("bookingTable");
 
-    if (carTableBody) {
-            carTableBody.innerHTML = "";
+    if (bookingTable) {
+            bookingTable.innerHTML = "";
             if (!bookings || bookings.length === 0) {
-                carTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center;">Du har inga bokningar ännu.</td></tr>`;
+                bookingTable.innerHTML = `<tr><td colspan="5" style="text-align:center;">Du har inga bokningar ännu.</td></tr>`;
             return;
             }
 
@@ -1202,15 +1373,13 @@ fetch(url, {
             const activeCell = document.createElement("td");
             activeCell.textContent = booking.active ? "Ja" : "Nej";
 
-            // 3. Lägg till alla celler i raden
             row.appendChild(idCell);
             row.appendChild(fromCell);
             row.appendChild(toCell);
             row.appendChild(carCell);
             row.appendChild(activeCell);
 
-            // 4. Tryck in den färdiga raden i tabellens tbody
-            carTableBody.appendChild(row);
+            bookingTable.appendChild(row);
         });
     }
 })
