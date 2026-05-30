@@ -53,6 +53,7 @@
   </div> 
 </li>
         <li><a href="#">Bokningar</a></li>
+        <li><a href="#updateBooking">Uppdatera bokning</a></li>
         <li><a href="#" class="logoutLink">Logga ut</a></li>
             </ul>
     </div>
@@ -279,9 +280,9 @@
         <thead>
             <tr>
                 <th>Id</th>
-                <th>Namn</th>
+                <th id="thName">Namn <i class="bi bi-sort-down"></i></th>
                 <th>Modell</th>
-                <th>Typ</th>
+                <th id="thType">Typ <i class="bi bi-sort-down"></i></th>
                 <th>Feature</th>
                 <th>Pris</th>
                 <th>Bokad?</th>
@@ -297,6 +298,31 @@
     </table>
 </div>
     </div>
+
+    <div id="getBookings" class="getAllBookings hidden">
+    <h2>Se alla bokningar</h2>
+    <p id="getAllBookingsMsg"></p>
+    <div class="bookingTable">
+        <table>
+            <thead>
+                <tr>
+                    <th>Boknings-ID</th>
+                    <th>Från Datum</th>
+                    <th>Till Datum</th>
+                    <th>Användar-ID</th>
+                    <th>Bil-ID</th>
+                    <th>Status (Aktiv)</th>
+                    <th>Åtgärder</th>
+                </tr>
+            </thead>
+            <tbody id="bookingTableBody">
+                <tr>
+                    <td colspan="7">Laddar bokningar...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
 
     <div id="deleteCar" class="hidden">
         <h2>Radera bil</h2>

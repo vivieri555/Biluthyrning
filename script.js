@@ -592,6 +592,8 @@ return response.json().then((data) => {
         createCarMsg.textContent = "Ett fel inträffade. Försök igen senare.";
     })
     });
+    let currentCars = [];
+    let sortDirections = { name: "asc", type: "asc" };
 
     //Hämta bil för alla
     let headersCarGet = new Headers();
@@ -613,6 +615,7 @@ return response.json().then((data) => {
     })
     .then((cars) => {
 
+        currentCars = cars;
         createTableCars(cars);
     })
     .catch((error) => {
@@ -722,6 +725,40 @@ getAllCarsLink.forEach(function(link) {
     });
 });
 
+document.addEventListener("DOMContentLoaded", () => {
+    const sortName = document.getElementById("thName");
+    const sortType = document.getElementById("thType");
+
+    if (sortName) {
+        sortName.addEventListener("click", () => {
+            sortCarsByField("name");
+        });
+    }
+    if (sortType) {
+        sortType.addEventListener("click", () => {
+            sortCarsByField("type");
+        });
+    }
+});
+
+function sortCarsByField(field) {
+    if (currentCars.length === 0) return;
+
+    const direction = sortDirections[field] === "asc" ? "desc" : "asc";
+    sortDirections[field] = direction;
+
+    currentCars.sort((a, b) => {
+        const valueA = (a[field] || "").toString();
+        const valueB = (b[field] || "").toString();
+
+        const comparison = valueA.localeCompare(valueB, "sv");
+
+        return direction === "asc" ? comparison : -comparison;
+    });
+
+    createTableCars(currentCars);
+}
+
 const deleteCarLink = document.querySelector(`a[href="#deleteCar"]`);
 if(deleteCarLink) {
     deleteCarLink.addEventListener("click", (event) => {
@@ -782,7 +819,80 @@ function deleteCar(id) {
         deleteCarMsg.style.color = "red";
     });
 }
+//Uppdatera bokning med id
+const updateBookingBtn = document.getElementById("updateBookingBtn"); 
 
+if (updateBookingBtn) {
+    updateBookingBtn.addEventListener("click", function(event) { 
+        event.preventDefault(); 
+        putBooking(); 
+    }); 
+}
+
+let headPutBooking = new Headers(); 
+headPutBooking.append("Content-Type", "application/json"); 
+headPutBooking.append("Accept", "application/json"); 
+
+function putBooking() { 
+    const id = document.getElementById("updateBookingId")?.value || ""; 
+    const updateFromDate = document.getElementById("updateFromDate")?.value || ""; 
+    const updateToDate = document.getElementById("updateToDate")?.value || ""; 
+    const updateUserId = document.getElementById("userId")?.value || ""; 
+    const updateCarId = document.getElementById("updateCarId")?.value || ""; 
+    const active = false; 
+    const updateBookingMsg = document.getElementById("updateBookingMsg"); 
+    if (updateBookingMsg) {
+        updateBookingMsg.textContent = ""; 
+    }
+
+    if (!id) { 
+        if (updateBookingMsg) { 
+            updateBookingMsg.textContent = "Ange ett giltigt boknings-ID."; 
+            updateBookingMsg.style.color = "red"; 
+        } 
+        return; 
+    } 
+
+    const updateData = { 
+        id: id,
+        fromDate: updateFromDate,
+        toDate: updateToDate,
+        userId: updateUserId,
+        carId: updateCarId,
+        active: active
+    }; 
+    
+    const url = `http://localhost:8080/api/v1/bookings/${id}`; 
+
+    fetch(url, { 
+        method: "PUT", 
+        headers: headPutBooking,
+        body: JSON.stringify(updateData), 
+        mode: "cors", 
+        credentials: "include" 
+    }) 
+    .then((response) => { 
+        if (!response.ok) throw new Error("Gick inte att uppdatera bokningen"); 
+        return response.json(); 
+    }) 
+    .then((data) => { 
+        if (updateBookingMsg) { 
+            updateBookingMsg.style.color = "green"; 
+            updateBookingMsg.textContent = "Bokningen har uppdaterats i databasen!"; 
+ 
+            const form = document.getElementById("updatePutBookingForm");
+            if (form) form.reset(); 
+        } 
+        console.log("Uppdatering av bokning lyckades:", data); 
+    }) 
+    .catch((error) => { 
+        console.error("Error:", error); 
+        if (updateBookingMsg) {
+            updateBookingMsg.textContent = "Ett fel inträffade. Försök igen senare."; 
+            updateBookingMsg.style.color = "red"; 
+        }
+    }); 
+}
 
 //Hämta enskild bil
 const getACarLink = document.querySelector(`a[href="#getACar"]`);

@@ -132,6 +132,9 @@ max-height: 50px;
     box-sizing: border-box; 
     z-index: 1000; 
     }
+    .commercial img {
+        width: 160px;
+    }
     #main
     {
         margin-bottom: 180px;
@@ -358,4 +361,13 @@ background-color: #ddd;
 #myBookings {
     margin: 50px;
     margin-left: 100px;
+}
+
+#thName {
+    cursor: pointer;
+    user-select: none;
+}
+#thType {
+    cursor: pointer;
+    user-select: none;
 }
