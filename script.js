@@ -654,7 +654,9 @@ function createTableCars (cars) {
                 <td>${car.name}</td>
                 <td>${car.model}</td>
                 <td>${car.type}</td>
-                <td>${car.feature1 || ""}, ${car.feature2 || ""}, ${car.feature3 || ""}</td>
+                <td>${car.feature1}</td>
+                <td>${car.feature2}</td>
+                <td>${car.feature3}</td>
                 <td>${car.price} kr</td>
                 <td>${car.booked ? "Ja" : "Nej"}</td>
                 <td><img src="${imageSrc}" alt="${car.name}" class="table-car-img" width="50"></td>
@@ -728,6 +730,13 @@ getAllCarsLink.forEach(function(link) {
 document.addEventListener("DOMContentLoaded", () => {
     const sortName = document.getElementById("thName");
     const sortType = document.getElementById("thType");
+    const sortId = document.getElementById("thId");
+    const sortModel = document.getElementById("thModel");
+    const sortFeature1 = document.getElementById("thFeature1");
+    const sortFeature2 = document.getElementById("thFeature2");
+    const sortFeature3 = document.getElementById("thFeature3");
+    const sortPrice = document.getElementById("thPrice");
+    const sortBooked = document.getElementById("thBooked");
 
     if (sortName) {
         sortName.addEventListener("click", () => {
@@ -739,6 +748,26 @@ document.addEventListener("DOMContentLoaded", () => {
             sortCarsByField("type");
         });
     }
+    const isAdmin = localStorage.getItem("isAdmin") === "true";
+    if (isAdmin === true) {
+const sortColumn = [
+    {id: "thId", field: "id"},
+    {id: "thModel", field: "model"},
+    {id: "thFeature1", field: "feature1"},
+    {id: "thFeature2", field: "feature2"},
+    {id: "thFeature3", field: "feature3"},
+    {id: "thPrice", field: "price"},
+    {id: "thBooked", field: "booked"}
+    ];
+sortColumn.forEach(col => {
+    const column = document.getElementById(col.id);
+    if (column) {
+        column.addEventListener("click", () => {
+            sortCarsByField(col.field);
+        });
+    }
+});
+}
 });
 
 function sortCarsByField(field) {
@@ -750,6 +779,10 @@ function sortCarsByField(field) {
     currentCars.sort((a, b) => {
         const valueA = (a[field] || "").toString();
         const valueB = (b[field] || "").toString();
+
+        if(typeof valueA === "number" && typeof valueB === "number") {
+    return direction === "asc" ? valueA - valueB : valueB - valueA;
+        }
 
         const comparison = valueA.localeCompare(valueB, "sv");
 
