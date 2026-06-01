@@ -57,7 +57,7 @@
     <div id="dropdownBookingsDiv" class="dropdown-content">
          <li><a href="#getBookings">Se alla bokningar</a></li>
         <li><a href="#updateBooking">Uppdatera bokning</a></li>
-         <li><a href="#">Bokningar</a></li>
+        <li><a href="#deleteBooking">Radera bokningar</a></li>
     </div>
 </li>
  <li><a href="#" class="logoutLink">Logga ut</a></li>
@@ -74,12 +74,11 @@
         <ul class="userNavClass">
             <li><a href="#getAllCars" id="getAllCarsUserLink">Se och boka bilar</a></li>
             <li><a href="">Hantera användare</a></li>
-                <!-- PUT o GET via ID för användare-->
-                 <li><a href="">Uppdatera din profil</a></li>
+            <li><a href="">Uppdatera din profil</a></li>
             <li><a href="#getACarUser" id="getACarUserLink">Hämta en specifik bil</a></li>
-                <li><a href="#myBookings" id="myBookingsLink">Se dina bokningar</a></li>
-                <li><a href="">Hämta en enskild bokning med id</a></li>
-                <li><a href="#" class="logoutLink">Logga ut</a></li>
+            <li><a href="#myBookings" id="myBookingsLink">Se dina bokningar</a></li>
+            <li><a href="">Hämta en enskild bokning med id</a></li>
+            <li><a href="#" class="logoutLink">Logga ut</a></li>
         </ul>
     </div>
     <div class="headerRight"></div>
@@ -111,7 +110,7 @@
 
     <div id="getAllUsers" class="hidden">
         <h2>Hämta alla användare här</h2>
-        <button id="getAllUsersBtn">Läs in användare</button>
+        <button id="getAllUsersBtn" class="standardBtn">Läs in användare</button>
         <ul id="userList"></ul>
     </div>
 
@@ -143,7 +142,7 @@
 <label for="updateRole">Roll:</label>
 <input type="text" id="updateRole" name="updateRole"><br>
 
-        <button id="updateUserBtn">Uppdatera</button>
+        <button id="updateUserBtn" class="positiveBtn">Spara</button>
 
         <p id="updateMsg"></p>
         </form>
@@ -154,7 +153,7 @@
 <form id="updateCar1">
      <label for="updateCarId1">Ange bilens id:</label>
             <input type="text" id="updateCarId1" name="updateCarId1">
-            <button id="updateCar1Btn">Hämta</button>
+            <button id="updateCar1Btn" class="standardBtn">Hämta</button>
             <p id="updateCar1Msg"></p>
 </form>
     </div> 
@@ -182,7 +181,7 @@
 <label for="updateBooked">Bokad: </label> 
 <input type="text" id="updateBooked" name="updateBooked"> 
 
-<button id="updateCarBtn">Uppdatera </button> 
+<button id="updateCarBtn" class="positiveBtn">Spara </button> 
 <p id="updateCarMsg"></p> 
 </form> 
 </div> 
@@ -192,7 +191,7 @@
 <form id="updateBookingForm2">
      <label for="updateBookingId2">Ange bokningens id:</label>
             <input type="text" id="updateBookingId2" name="updateBookingId2">
-            <button id="updateIdBookingBtn2">Hämta</button>
+            <button id="updateIdBookingBtn2" class="standardBtn">Hämta</button>
             <p id="updateBookingMsg2"></p>
 </form>
     </div> 
@@ -215,7 +214,7 @@
 <input type="text" id="updateBookingActive" name="updateBookingActive"> 
 
 
-<button id="updateBookingBtn">Uppdatera </button> 
+<button id="updateBookingBtn" class="positiveBtn">Spara </button> 
 <p id="updateBookingMsg"></p> 
 </form> 
 </div> 
@@ -227,7 +226,7 @@
 
         <label for="deleteUserId">Användar-ID:</label>
         <input type="text" id="deleteUserId" name="deleteUserId"><br>
-        <button id="deleteUserBtn">Radera</button>
+        <button id="deleteUserBtn" class="negativeBtn">Radera</button>
         <p id="deleteMsg"></p>
     </form>
     </div>
@@ -238,7 +237,7 @@
     <form id="getUserForm">
         <label for="getUserId">Användar-ID:</label>
         <input type="text" id="getUserId" name="getUserId"><br>
-        <button id="getUserBtn">Hämta</button>
+        <button id="getUserBtn" class="standardBtn">Hämta</button>
         <p id="getUserMsg"></p>
     </form>
     </div>
@@ -258,7 +257,7 @@
         <input type="text" id="phone" name="phone">
         <label for="email">E-post:</label>
         <input type="email" id="email" name="email">
-        <button type="submit" id="createAccountBtn" class="standardBtn">Skapa konto</button>
+        <button type="submit" id="createAccountBtn" class="positiveBtn">Skapa konto</button>
         </form>
         <p id="createMsg"></p>
     </div>
@@ -280,7 +279,7 @@
         <input type="email" id="email2" name="email2">
         <label for="role2">Ange roll endast om det är ADMIN, annars lämna fältet tomt för vanlig user:</label>
         <input type="text" id="role2" name="role2">
-        <button type="submit" id="createAccountBtn2" class="standardBtn">Skapa konto</button>
+        <button type="submit" id="createAccountBtn2" class="positiveBtn">Skapa konto</button>
         </form>
         <p id="createMsg2"></p>
     </div>
@@ -306,12 +305,12 @@
             <input type="checkbox" id="booked" name="booked">
             <label for="carImage">Bild på bil</label>
             <input type="file" id="carImage" accept="image/*">
-            <button type="submit" id="createCarBtn">Skapa bil</button>
+            <button type="submit" id="createCarBtn" class="positiveBtn">Skapa bil</button>
         </form>
         <p id="createCarMsg"></p>
     </div>
 
-    <div id="getAllCars" class="getAllCars hidden">
+    <div id="getAllCarsList" class="getAllCars hidden">
 <h2>Se vilka bilar som finns</h2>
 <p id="getAllCarsMsg"></p>
 <div class="carTable">
@@ -370,7 +369,7 @@
         <form for="deleteCarForm">
             <label for="deleteCarId">Ange bilens id:</label>
             <input type="text" id="deleteCarId" name="deleteCarId">
-            <button id="deleteCarBtn">Radera</button>
+            <button id="deleteCarBtn" class="negativeBtn">Radera</button>
             <p id="deleteCarMsg"></p>
         </form>
     </div>
@@ -380,7 +379,7 @@
         <form id="getACarForm">
             <label for="getACarId">Ange bilens id:</label>
             <input type="text" id="getACarId" name="getACarId">
-            <button id="getACarBtn">Hämta</button>
+            <button id="getACarBtn" class="standardBtn">Hämta</button>
             <p id="getACarMsg"></p>
         </form>
     </div>
@@ -389,7 +388,7 @@
 <form id="getACarFormUser">
      <label for="getACarId2">Ange bilens id:</label>
             <input type="text" id="getACarId2" name="getACarId2">
-            <button id="getACarBtn2">Hämta</button>
+            <button id="getACarBtn2" class="standardBtn">Hämta</button>
             <p id="getACarMsg2"></p>
 </form>
     </div> 
@@ -405,8 +404,8 @@
             <input type="date" id="createFromDate" name="createFromDate">
             <label for="createToDate">Boka till datum:</label>
             <input type="date" id="createToDate" name="createToDate">
-            <button type="submit" id="submitBookBtn">Spara bokning</button>
-            <button type="button" id="cancelBookingBtn">Avbryt</button>
+            <button type="submit" id="submitBookBtn" class="positiveBtn">Spara bokning</button>
+            <button type="button" id="cancelBookingBtn" class="negativeBtn">Avbryt</button>
         </form>
         <p id="createBooking"></p>
     </div>
@@ -433,6 +432,15 @@
                 </tbody>
             </table>
         </div>
+    </div>
+     <div id="deleteBooking" class="hidden">
+        <h2>Radera Bokning</h2>
+        <form for="deleteBookingForm">
+            <label for="deleteBookingId">Ange bokningens id:</label>
+            <input type="text" id="deleteBookingId" name="deleteBookingId">
+            <button id="deleteBookingBtn" class="negativeBtn">Radera</button>
+            <p id="deleteBookingMsg"></p>
+        </form>
     </div>
 
 </div>
