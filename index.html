@@ -16,7 +16,7 @@
     <div id="navigation">
  <nav id="navContainer">
 <ul class="navClass">
-<li><a href="#loggInDiv">Logga in</a></li>
+<li><a href="#loggInDiv">Logga in <i class="bi bi-box-arrow-left"></i></a></li>
 <li><a href="#createAccount">Skapa konto</a></li>
 <li><a href=".getAllCars">Se bilar</a></li>
 </ul>
@@ -32,7 +32,7 @@
     <div id="adminMenuCenter">
     <ul class="adminNavClass" id="adminMenu"> 
                 <li class="dropdownCarAdminMenu">
-                    <button id="carAdminBtn">Hantera Bilar</button>
+                    <button id="carAdminBtn">Hantera Bilar <i class="bi bi-list"></i></button>
                     <div id="CarAdminDivDrop" class="dropdown-content">
                         <a href=".getAllCars">Se alla Bilar</a>
                         <a href="#createCarDiv">Skapa ny bil</a>
@@ -43,7 +43,7 @@
                 </li>
                 
                 <li class="dropdownMenu">
-  <button id="dropAdminBtn">Användare</button> 
+  <button id="dropAdminBtn">Användare <i class="bi bi-list"></i></button> 
   <div id="myDropdown" class="dropdown-content"> 
     <a href="#createAccount2">Skapa ny användare</a> 
     <a href="#getAllUsers">Hämta alla användare</a> 
@@ -55,9 +55,8 @@
 <li class="dropdownAdminBookingMenu">
     <button id="dropdownBookingBtn">Bokningar</button>
     <div id="dropdownBookingsDiv" class="dropdown-content">
-         <li><a href="#getBookings">Se alla bokningar</a></li>
+         <li><a href="#getBookings">Hantera bokningar</a></li>
         <li><a href="#updateBooking">Uppdatera bokning</a></li>
-        <li><a href="#deleteBooking">Radera bokningar</a></li>
     </div>
 </li>
  <li><a href="#" class="logoutLink">Logga ut</a></li>
@@ -340,7 +339,20 @@
     </div>
 
     <div id="getBookings" class="getAllBookings hidden">
-    <h2>Se alla bokningar</h2>
+        <div id="bookingHeadContainer">
+             <div id="searchBooking">
+    <form id="searchBookingForm">
+        <label for="getBookingId">Sök på Boknings-ID:</label>
+        <input type="text" id="getBookingId" name="getBookingId"><br>
+        <button type="submit" id="searchBookingBtn" class="positiveBtn">Sök</button>
+        <button type="button" id="activeBookingBtn" class="standardBtn">Visa alla aktiva</button>
+            <button type="button" id="clearSearchBtn" class="standardBtn">Visa alla</button>
+            <p id="searchBookingMsg"></p>
+    </form>
+    </div>
+      <h1>Se alla bokningar</h1>
+        </div>
+  
     <p id="getAllBookingsMsg"></p>
     <div class="bookingTable">
         <table>
@@ -414,6 +426,7 @@
         <h3>Här kan du se alla dina bokningar</h3>
         <ul id="myBookingsList"></ul>
         <p id="myBookingsMsg"></p>
+        <p id="deleteBookingMsg"></p>
         <div class="myBookingsTable">
             <table>
                 <thead>
@@ -432,15 +445,6 @@
                 </tbody>
             </table>
         </div>
-    </div>
-     <div id="deleteBooking" class="hidden">
-        <h2>Radera Bokning</h2>
-        <form for="deleteBookingForm">
-            <label for="deleteBookingId">Ange bokningens id:</label>
-            <input type="text" id="deleteBookingId" name="deleteBookingId">
-            <button id="deleteBookingBtn" class="negativeBtn">Radera</button>
-            <p id="deleteBookingMsg"></p>
-        </form>
     </div>
 
 </div>

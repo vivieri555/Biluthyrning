@@ -12,7 +12,7 @@ function hideAllSections() {
     const sections = ["loggInDiv", "createAccount", "createAccount2", "getAllUsers", "updatePutUser", 
         "deleteUser", "getUser", "getAllCarsList", "getACar", "deleteCar",
     "createCarDiv", "createBookingDiv", "bookBtn", "myBookings", "getACarUser"
-, "updateCarDiv", "updateCar", "getBookings", "updateBooking", "deleteBooking"];
+, "updateCarDiv", "updateCar", "getBookings", "updateBooking"];
     sections.forEach(id => {
         const element = document.getElementById(id);
         if (element) element.classList.add("hidden");
@@ -1312,7 +1312,89 @@ sortColumn.forEach(col => {
         });
     }
 });
-})
+    searchBooking();
+  
+    const activeBookingBtn = document.getElementById("activeBookingBtn");
+    if (activeBookingBtn) {
+        activeBookingBtn.addEventListener("click", () => {
+            searchActiveBooking();
+        });
+    }
+});
+
+function searchBooking() {
+    const searchBookingForm = document.getElementById("searchBookingForm");
+    const getBookingId = document.getElementById("getBookingId");
+    const searchBookingMsg = document.getElementById("searchBookingMsg");
+    const clearSearchBtn = document.getElementById("clearSearchBtn");
+
+    if (searchBookingForm) {
+        searchBookingForm.addEventListener("submit", (event) => {
+            event.preventDefault();
+            
+            const searchValue = getBookingId.value.trim();
+            if (searchBookingMsg) searchBookingMsg.textContent = "";
+
+            if (searchValue === "") {
+                createTableAllBookings(currentBookings);
+                return;
+            }
+            const filteredBookings = currentBookings.filter(booking => 
+                booking.id && booking.id.toString() === searchValue
+            );
+            createTableAllBookings(filteredBookings);
+
+            if (filteredBookings.length === 0 && searchBookingMsg) {
+                searchBookingMsg.textContent = "Ingen bokning matchade det ID:t.";
+                searchBookingMsg.style.color = "red";
+            }
+        });
+    }
+
+    if (clearSearchBtn) {
+        clearSearchBtn.addEventListener("click", () => {
+            if (getBookingId) getBookingId.value = "";
+            if (searchBookingMsg) searchBookingMsg.textContent = "";
+            createTableAllBookings(currentBookings);
+        });
+    }
+}
+//Sök aktiva bokningar
+function searchActiveBooking() {
+    const basicAuth = localStorage.getItem("basicAuth");
+    const url = `http://localhost:8080/api/v1/bookings/active`;
+    const searchMsg = document.getElementById("searchBookingMsg");
+    if (searchMsg) { searchMsg.textContent = "Hämtar alla aktiva bokningar.."; }
+
+    let headersActive = new Headers();
+    headersActive.append("Content-Type", "application/json");
+    headersActive.append("Accept", "application/json");
+    if (basicAuth) {
+        headersActive.set("Authorization", `Basic ${basicAuth}`);
+    }
+
+    fetch(url, {
+        headers: headersActive,
+        mode: "cors",
+        credentials: "include",
+        method: "GET"
+    })
+    .then((response) => {
+        if (!response.ok) { throw new Error(`Fel med server: ${response.status}`); }
+        return response.json();
+    })
+    .then((activeBookings) => {
+        if (searchMsg) searchMsg.textContent = "";
+        createTableAllBookings(activeBookings);
+    })
+    .catch((error) => {
+        console.error("Fel vid hämtning av aktiva bokningar", error);
+        if (searchMsg) {
+            searchMsg.textContent = "Kunde inte hämta aktiva bokningar.";
+            searchMsg.style.color = "red";
+        }
+    });
+}
 
 //Sortera bokningar
 function sortBookingsByField(field) {
@@ -1545,27 +1627,6 @@ if(updateCarLink) {
     }); 
 } 
 
-const deleteBookingLink = document.querySelector(`a[href="#deleteBooking"]`);
-if(deleteBookingLink) {
-    deleteBookingLink.addEventListener("click", (event) => {
-        event.preventDefault();
-        hideAllSections();
-        const targetDiv = document.getElementById("deleteBooking");
-        if (targetDiv) {
-            targetDiv.classList.remove("hidden");
-        }
-        document.getElementById("dropdownBookingsDiv").classList.remove("show");
-    });
-}
-
-const deleteBookingBtn = document.getElementById("deleteBookingBtn"); 
-
-if (deleteBookingBtn) { 
-    deleteBookingBtn.addEventListener("click", function(event) { 
-        event.preventDefault();
-        deleteBooking(); 
-    }); 
-} 
 
 let headersDelBooking = new Headers();
 headersDelBooking.append("Content-Type", "application/json");
@@ -1578,26 +1639,29 @@ function deleteBooking(id) {
     }
     const basicAuth = localStorage.getItem("basicAuth");
     const deleteBookingMsg = document.getElementById("deleteBookingMsg");
-    const url = `http://localhost:8080/api/v1/cars/${id}`;
+    const url = `http://localhost:8080/api/v1/bookings/${id}`;
       if (basicAuth) {
-        headersDelBooking.append("Authorization", `Basic ${basicAuth}`);
+        headersDelBooking.set("Authorization", `Basic ${basicAuth}`);
     }
     fetch( url, {
         method: "DELETE",
+        mode: "cors",
         headers: headersDelBooking,
         credentials: "include"
     })
     .then((response) => {
-        if(!response.ok) throw new Error("Gick inte att ta bort bokning");
-        const data = response.text();
-        if(data === null) throw new Error("Inget returneras");
-        deleteBookingMsg.textContent = "Bokningen har tagits bort!"
+if(response.ok) {
+ deleteBookingMsg.textContent = "Bokningen har tagits bort!"
         deleteBookingMsg.style.color = "green";
-       const form = document.getElementById("deleteBookingForm");
+        getAllBookings();
+        const form = document.getElementById("deleteBookingForm");
         if(form) {
             form.reset();
         }
-        getAllBookings();
+        return;
+  }
+
+            throw new Error("Gick inte att ta bort bokning");
     })
     .catch((error) => {
         console.error("Error:", error);
