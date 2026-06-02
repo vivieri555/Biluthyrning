@@ -1245,7 +1245,7 @@ const isAdmin = localStorage.getItem("isAdmin") === "true";
     <td>${booking.toDate}</td>
     <td>${booking.userId}</td>
     <td>${booking.carId}</td>
-    <td>${booking.booked ? "Ja" : "Nej"}</td>
+    <td>${booking.active ? "Ja" : "Nej"}</td>
     <td class="actions"></td>
     `;
     const actionsBook = row.querySelector(".actions");
@@ -1320,6 +1320,12 @@ sortColumn.forEach(col => {
             searchActiveBooking();
         });
     }
+    const searchUsersBookingBtn = document.getElementById("searchUsersBookingBtn");
+    if (searchUsersBookingBtn) {
+        searchUsersBookingBtn.addEventListener("click", () => {
+            searchUsersBooking();
+        });
+    }
 });
 
 function searchBooking() {
@@ -1358,6 +1364,49 @@ function searchBooking() {
             createTableAllBookings(currentBookings);
         });
     }
+}
+//sök användares alla bokningar
+function searchUsersBooking() {
+    const basicAuth = localStorage.getItem("basicAuth");
+    const searchMsg = document.getElementById("searchUsersBookingMsg");
+    const userId = document.getElementById("searchUsersBooking").value.trim();
+    if(!userId) {
+  searchMsg.textContent = "Ange ett giltigt användar-id";
+  return;
+    }
+
+    const url = `http://localhost:8080/api/v1/bookings/user/${userId}`;
+    
+    if (searchMsg) { searchMsg.textContent = "Hämtar alla aktiva bokningar.."; }
+
+    let headers = new Headers();
+    headers.append("Content-Type", "application/json");
+    headers.append("Accept", "application/json");
+    if (basicAuth) {
+        headers.set("Authorization", `Basic ${basicAuth}`);
+    }
+
+    fetch(url, {
+        headers: headers,
+        mode: "cors",
+        credentials: "include",
+        method: "GET"
+    })
+    .then((response) => {
+        if (!response.ok) { throw new Error(`Fel med server: ${response.status}`); }
+        return response.json();
+    })
+    .then((bookings) => {
+        if (searchMsg) searchMsg.textContent = "";
+        createTableAllBookings(bookings);
+    })
+    .catch((error) => {
+        console.error("Fel vid hämtning av bokningar", error);
+        if (searchMsg) {
+            searchMsg.textContent = "Kunde inte hämta bokningar.";
+            searchMsg.style.color = "red";
+        }
+    });
 }
 //Sök aktiva bokningar
 function searchActiveBooking() {
@@ -1407,11 +1456,18 @@ function sortBookingsByField(field) {
         const valueA = (a[field] || "").toString();
         const valueB = (b[field] || "").toString();
 
-        if(typeof valueA === "number" && typeof valueB === "number") {
-    return direction === "asc" ? valueA - valueB : valueB - valueA;
+        if(typeof valueA === "boolean" && typeof valueB === "boolean") {
+    return direction === "asc" ? (valueA === valueB ? 0 : valueA ? -1 : 1) : (valueA === valueB ? 0 : valueA ? 1 : -1);
         }
 
-        const comparison = valueA.localeCompare(valueB, "sv");
+        const strA = (valueA || "").toString();
+        const strB = (valueB || "").toString();
+
+        if(!isNaN(strA) && !isNaN(strB) && strA !== "" && strB !== "") {
+            return direction === "asc" ? valueA - valueB : valueB - valueA;
+        }
+
+        const comparison = strA.localeCompare(strB, "sv");
         return direction === "asc" ? comparison : -comparison;
     });
 

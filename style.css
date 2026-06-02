@@ -179,6 +179,13 @@ max-height: 50px;
         border: 5px solid rgb(23, 23, 63);
         width: 30%;
     }
+    #updatePutUser {
+        display: flex;
+        align-items: center;
+       flex-direction: column;
+       padding: 30px;
+       gap: 3px;
+    }
     #loggInForm {
         display: flex;
         flex-direction: column;
@@ -520,6 +527,13 @@ input[readOnly] {
 }
 #bookingHeadContainer {
    display: flex;
+   justify-content: space-between;
+   align-items: center;
+   margin-bottom: 20px;
+   width: 100%;
+}
+#searchUsersBookingsDiv {
+    display: flex;
    justify-content: space-between;
    align-items: center;
    margin-bottom: 20px;
