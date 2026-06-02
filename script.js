@@ -3,9 +3,9 @@ const usernameInput = document.getElementById("username");
 const passwordInput = document.getElementById("password"); 
 const validationLoggIn = document.getElementById("validationLoggIn"); 
 let loggInAttempts = 0; 
-const password = "user";
-const username = "user";
+
 let currentCars = [];
+let currentBookings = [];
 let sortDirections = { name: "asc", type: "asc" };
 
 function hideAllSections() {
@@ -129,6 +129,9 @@ headersPost.append("Content-Type", "application/json");
 headersPost.append("Accept", "application/json");
 
 function postLogIn() {
+     const username = usernameInput.value;
+const password = passwordInput.value;
+const basicAuthString = btoa(`${username}:${password}`);
 const data = {
     username: usernameInput.value,
     password: passwordInput.value
@@ -151,9 +154,7 @@ fetch(url, {
     validationLoggIn.innerHTML = JSON.stringify(data);
     loggInAttempts = 0;
     logEvent("Användaren har loggat in.");
-    const username = usernameInput.value;
-const password = passwordInput.value;
-const basicAuthString = btoa(`${username}:${password}`);
+   
     localStorage.setItem("isLoggedIn", "true");
     localStorage.setItem("customerId", data.id);
     localStorage.setItem("basicAuth", basicAuthString);
@@ -1043,26 +1044,6 @@ window.onclick = function(event) {
     }  
   }  
 } 
-//funktion för admin bokningsmeny
-const dropdownBookingBtn = document.getElementById("dropdownBookingBtn");
-if (dropdownBookingBtn) {
-    dropdownBookingBtn.onclick = function(event) {
-        document.getElementById("dropdownBookingsDiv").classList.toggle("show");
-        event.stopPropagation();
-    };
-}
-window.onclick = function(event) {
-    if(!event.target.matches('#dropdownBookingBtn')) {
-        var dropdowns = this.document.getElementsByClassName("dropdown-content");
-        var i;
-        for (i = 0; i < dropdowns.length; i++) {
-            var openDropdown = dropdowns[i];
-            if (openDropdown.classList.contains('show')) {
-                openDropdown.classList.remove('show');
-            }
-        }
-    }
-}
 
 //Bokningar Boka
 
@@ -1188,11 +1169,11 @@ if(getBookingsLink) {
         if (targetDiv) {
             targetDiv.classList.remove("hidden");
         }
-        document.getElementById("dropdownBookingsDiv").classList.remove("show");
+        document.getElementById("adminMenuCenter").classList.remove("show");
         getAllBookings(); 
     });
 }
-let currentBookings = [];
+
 //Hämta alla bokningar admin
 function getAllBookings() {
     const basicAuth = localStorage.getItem("basicAuth");
@@ -1473,6 +1454,43 @@ function sortBookingsByField(field) {
 
     createTableAllBookings(currentBookings);
 }
+//Sök på enskild bokning med angivet id
+function searchBookingForUser() { 
+const id = document.getElementById()
+const basicAuth = localStorage.getItem("basicAuth");
+const searchMsg = document.getElementById("searchBookingForUserMsg");
+const url = `http://localhost:8080/api/v1/bookings/${id}`;
+
+let headers = new Headers();
+headers.append("Content-Type", "application/json");
+headers.append("Accept", "application/json");
+if (basicAuth) {
+    headers.set("Authorization", `BasicAuth ${basicAuth}`);
+}
+
+fetch(url, { 
+headers: headers,
+mode: "cors",
+credentials: "include",
+method: "GET"
+})
+.then((response) => { 
+if(!response.ok) { throw new Error(`Serverfel: ${response.status}`);} 
+return response.json(); 
+})
+.then((boookings) => {
+if(searchMsg) searchMsg.textContent = "";
+   //Skapa tabbell för bokningarna funktion
+   })
+   .catch((error) => {
+   console.error("Fel vid hämtning av bokning", error);
+        if (searchMsg) {
+            searchMsg.textContent = "Kunde inte hämta bokning.";
+            searchMsg.style.color = "red";
+        }
+    });
+ }
+
 
 //Hämta alla bokningar för inloggad användare
 function myBookings() {
@@ -1499,7 +1517,30 @@ fetch(url, {
     return response.json();
 })
 .then((bookings) => {
-    const bookingsTableBody = document.getElementById("bookingsTableBody");
+    currentBookings = bookings;
+    createTableUsers(bookings);
+})
+.catch((error) => {
+    console.error("Gick inte att hämta bokningar:", error);
+});
+}
+
+const myBookingsLink = document.getElementById("myBookingsLink");
+if (myBookingsLink) {
+myBookingsLink.addEventListener("click", function(event) {
+    event.preventDefault();
+    hideAllSections();
+    const targetDiv = document.getElementById("myBookings");
+    if (targetDiv) {
+        targetDiv.classList.remove("hidden");
+    }
+myBookings();
+searchBookingUsers();
+});
+}
+
+function createTableUsers(bookings) {
+    const bookingsTableBody = document.getElementById("userBookingsTableBody");
 
     if (bookingsTableBody) {
             bookingsTableBody.innerHTML = "";
@@ -1536,23 +1577,49 @@ fetch(url, {
             bookingsTableBody.appendChild(row);
         });
     }
-})
-.catch((error) => {
-    console.error("Gick inte att hämta bokningar:", error);
-});
 }
 
-const myBookingsLink = document.getElementById("myBookingsLink");
-if (myBookingsLink) {
-myBookingsLink.addEventListener("click", function(event) {
-    event.preventDefault();
-    hideAllSections();
-    const targetDiv = document.getElementById("myBookings");
-    if (targetDiv) {
-        targetDiv.classList.remove("hidden");
+function searchBookingUsers() {
+    const searchForm = document.getElementById("searchBookingForUserForm");
+    const bookingId = document.getElementById("searchBookingForUser");
+    const searchMsg = document.getElementById("searchBookingForUserMsg");
+    const clearBtn = document.getElementById("searchBookingForUserClearBtn");
+
+    if(searchForm) {
+        if(searchForm.getAttribute("data-listener") === "true") {
+            return;
+        }
     }
-myBookings();
-});
+
+    searchForm.setAttribute("data-listener", "true");
+    
+        searchForm.addEventListener("submit", (event) => {
+            event.preventDefault();
+            
+            const searchValue = bookingId.value.trim();
+            if (searchMsg) searchMsg.textContent = "";
+
+            if (searchValue === "") {
+                createTableUsers(currentBookings);
+                return;
+            }
+            const filteredBookings = currentBookings.filter(booking => 
+                booking.id && booking.id.toString() === searchValue
+            );
+            createTableUsers(filteredBookings);
+
+            if (filteredBookings.length === 0 && searchMsg) {
+                searchMsg.textContent = "Ingen bokning matchade det ID:t.";
+                searchMsg.style.color = "red";
+            }
+        });
+      if (clearBtn) {
+        clearBtn.addEventListener("click", () => {
+            if (bookingId) bookingId.value = "";
+            if (searchMsg) searchMsg.textContent = "";
+            createTableUsers(currentBookings);
+        });
+    }
 }
 
 //Uppdatera bil

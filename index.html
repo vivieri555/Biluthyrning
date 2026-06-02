@@ -52,12 +52,7 @@
     <a href="#getUser">Hämta specifik användare</a>
   </div> 
 </li>
-<li class="dropdownAdminBookingMenu">
-    <button id="dropdownBookingBtn">Bokningar</button>
-    <div id="dropdownBookingsDiv" class="dropdown-content">
-         <li><a href="#getBookings">Hantera bokningar</a></li>
-    </div>
-</li>
+    <li><a href="#getBookings">Hantera bokningar</a></li>
  <li><a href="#" class="logoutLink">Logga ut</a></li>
             </ul>
     </div>
@@ -428,6 +423,15 @@
     </div>
 
     <div id="myBookings" class="hidden">
+        <div id="searchBookingForUserDiv">
+            <form id="searchBookingForUserForm">
+                <label for="searchBookingForUser">Sök på boknings-id:</label>
+                <input type="text" id="searchBookingForUser" name="searchBookingForUser">
+                <button type="submit" id="searchBookingForUserBtn" class="positiveBtn">Sök</button>
+                <button type="button" id="searchBookingForUserClearBtn" class="negativeBtn">Rensa filter</button>
+                <p id="searchBookingForUserMsg"></p>
+            </form>
+        </div>
         <h3>Här kan du se alla dina bokningar</h3>
         <ul id="myBookingsList"></ul>
         <p id="myBookingsMsg"></p>
@@ -436,14 +440,14 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Bokningsid</th>
-                        <th>Bokat från datum</th>
-                        <th>Bokat till datum</th>
-                        <th>Bilens id</th>
-                        <th>Aktiv bokning</th>
+                        <th id="userBookingId">Bokningsid</th>
+                        <th id="userFromDate">Bokat från datum</th>
+                        <th id="userToDate">Bokat till datum</th>
+                        <th id="userCarId">Bilens id</th>
+                        <th id="userActive">Aktiv bokning</th>
                     </tr>
                 </thead>
-                <tbody id="bookingsTableBody">
+                <tbody id="userBookingsTableBody">
                     <tr>
                         <td colspan="5"></td>
                     </tr>
