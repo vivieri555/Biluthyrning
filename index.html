@@ -47,7 +47,7 @@
   <div id="myDropdown" class="dropdown-content"> 
     <a href="#createAccount2">Skapa ny användare</a> 
     <a href="#getAllUsers">Hämta alla användare</a> 
-    <a href="#updatePutUser">Uppdatera användare</a> 
+    <a href="#updateUser">Uppdatera användare</a> 
     <a href="#deleteUser">Ta bort användare</a>
     <a href="#getUser">Hämta specifik användare</a>
   </div> 
@@ -66,8 +66,7 @@
     <div id="userMenuCenter">
         <ul class="userNavClass">
             <li><a href="#getAllCars" id="getAllCarsUserLink">Se och boka bilar</a></li>
-            <li><a href="">Hantera användare?</a></li>
-            <li><a href="">Uppdatera din profil?</a></li>
+            <li><a href="#updateUser">Användarprofil</a></li>
             <li><a href="#getACarUser" id="getACarUserLink">Hämta en specifik bil</a></li>
             <li><a href="#myBookings" id="myBookingsLink">Se dina bokningar</a></li>
             <li><a href="">Hämta en enskild bokning med id?</a></li>
@@ -105,7 +104,7 @@
     </div>
 
 
-    <div id="updatePutUser" class="hidden">
+    <div id="updateUser" class="hidden">
         <h2>Uppdatera användare</h2>
         <form id="updatePutUserForm">
             <label for="updateUserId">Användar-ID:</label>
@@ -129,8 +128,10 @@
 <label for="updateEmail">E-post:</label>
 <input type="email" id="updateEmail" name="updateEmail"><br>
 
-<label for="updateRole">Roll:</label>
-<input type="text" id="updateRole" name="updateRole"><br>
+
+    <label for="updateRole">Roll:</label>
+    <input type="text" id="updateRole" name="updateRole"><br>
+
 
         <button id="updateUserBtn" class="positiveBtn">Spara</button>
 
@@ -231,6 +232,8 @@
         <p id="getUserMsg"></p>
     </form>
     </div>
+
+    
 
     <div id="createAccount" class="hidden">
         <form id="createAccountForm">

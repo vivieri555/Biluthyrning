@@ -1,23 +1,38 @@
-const loggInForm = document.getElementById("loggInForm"); 
-const usernameInput = document.getElementById("username"); 
-const passwordInput = document.getElementById("password"); 
-const validationLoggIn = document.getElementById("validationLoggIn"); 
-let loggInAttempts = 0; 
+const loggInForm = document.getElementById("loggInForm");
+const usernameInput = document.getElementById("username");
+const passwordInput = document.getElementById("password");
+const validationLoggIn = document.getElementById("validationLoggIn");
+let loggInAttempts = 0;
 
+function getHeaders(auth) {
+    let headers = new Headers();
+    headers.append("Content-Type", "application/json");
+    headers.append("Accept", "application/json");
+
+    if (auth) {
+        headers.set("Authorization", `Basic ${auth}`);
+    }
+
+    return headers;
+}
 let currentCars = [];
 let currentBookings = [];
-let sortDirections = { name: "asc", type: "asc" };
+let sortDirections = {
+    name: "asc",
+    type: "asc"
+};
 
 function hideAllSections() {
-    const sections = ["loggInDiv", "createAccount", "createAccount2", "getAllUsers", "updatePutUser", 
+    const sections = ["loggInDiv", "createAccount", "createAccount2", "getAllUsers", "updatePutUser", "updateUser",
         "deleteUser", "getUser", "getAllCarsList", "getACar", "deleteCar",
-    "createCarDiv", "createBookingDiv", "bookBtn", "myBookings", "getACarUser"
-, "updateCarDiv", "updateCar", "getBookings", "updateBooking"];
+        "createCarDiv", "createBookingDiv", "bookBtn", "myBookings", "getACarUser", "updateCarDiv", "updateCar", "getBookings", "updateBooking"
+    ];
     sections.forEach(id => {
         const element = document.getElementById(id);
         if (element) element.classList.add("hidden");
     });
 }
+
 function logEvent(message) {
     const timestamp = new Date().toLocaleString();
     console.log(`[${timestamp}] ${message}`);
@@ -53,36 +68,40 @@ document.getElementById("createAccountForm").addEventListener("submit", function
 
 function sendUserToApi(newUser, formId, messageElement) {
     const url = "http://localhost:8080/api/v1/users";
-fetch(url, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newUser),
-        credentials: "include"
-})
-.then(function(response) {
-    if (response.status === 204 || response.headers.get("Content-Type") === "0") {
-             return { status: response.ok, data: {} };
-         }
-    return response.json().then(function(data) {
-        return  { status: response.ok, data: data };
-    });
-})
-.then(function(result) {
-    if (result.status) {
-        alert("Konto sparat!");
-        document.getElementById(formId).reset();
-    } else {
-        messageElement.textContent = result.data.message || "Misslyckades att spara konto.";
-    }
-})
-.catch(function(error) {
-    console.error("Error:", error);
-    messageElement.textContent = "Ett fel inträffade. Försök igen senare.";
-});
+    fetch(url, {
+            method: "POST",
+            headers: getHeaders(),
+            body: JSON.stringify(newUser),
+            credentials: "include"
+        })
+        .then(function(response) {
+            if (response.status === 204 || response.headers.get("Content-Type") === "0") {
+                return {
+                    status: response.ok,
+                    data: {}
+                };
+            }
+            return response.json().then(function(data) {
+                return {
+                    status: response.ok,
+                    data: data
+                };
+            });
+        })
+        .then(function(result) {
+            if (result.status) {
+                alert("Konto sparat!");
+                document.getElementById(formId).reset();
+            } else {
+                messageElement.textContent = result.data.message || "Misslyckades att spara konto.";
+            }
+        })
+        .catch(function(error) {
+            console.error("Error:", error);
+            messageElement.textContent = "Ett fel inträffade. Försök igen senare.";
+        });
 }
-    
+
 const createAccount2Link = document.querySelector('a[href="#createAccount2"]');
 if (createAccount2Link) {
     createAccount2Link.addEventListener("click", function(event) {
@@ -123,75 +142,70 @@ loggInForm.addEventListener("submit", function(event) {
     postLogIn();
 });
 
-
-let headersPost = new Headers(); 
-headersPost.append("Content-Type", "application/json");
-headersPost.append("Accept", "application/json");
-
 function postLogIn() {
-     const username = usernameInput.value;
-const password = passwordInput.value;
-const basicAuthString = btoa(`${username}:${password}`);
-const data = {
-    username: usernameInput.value,
-    password: passwordInput.value
-}
-const url = "http://localhost:8080/api/v1/auth/login";
-fetch(url, {
-    method: "POST",
-    headers: headersPost,
-    body: JSON.stringify(data),
-    mode: "cors",
-    credentials: "include"
-})
-.then((response) => {
-    if (!response.ok) throw new Error("Felaktiga inloggningsuppgifter");
-    return response.json();
-})
-.then(data => {
-    validationLoggIn.textContent = "Inloggning lyckades!";
-    validationLoggIn.style.color = "green";
-    validationLoggIn.innerHTML = JSON.stringify(data);
-    loggInAttempts = 0;
-    logEvent("Användaren har loggat in.");
-   
-    localStorage.setItem("isLoggedIn", "true");
-    localStorage.setItem("customerId", data.id);
-    localStorage.setItem("basicAuth", basicAuthString);
-
-const loggInForm = document.getElementById("loggInForm");
-loggInForm.style.display = "none";
-navContainer.style.display = "none";
-const isAdmin = data.isAdmin;
-if (isAdmin === true) {
-    console.log(data);   //Kolla vad som kommer
-    localStorage.setItem("isAdmin", "true");
-    document.getElementById("adminNav").classList.remove("hidden");
-    document.getElementById("header1").classList.add("hidden");
-    document.getElementById("userHeader").classList.add("hidden");
-}
-else {
-    localStorage.setItem("isAdmin", "false");
-    document.getElementById("header1").classList.add("hidden");
-    document.getElementById("adminNav").classList.add("hidden");
-    document.getElementById("userHeader").classList.remove("hidden"); 
-}
-})
-
-.catch((error) => {
-    loggInAttempts++;
-    if (loggInAttempts <3) {
-    validationLoggIn.textContent = `Felaktigt användarnamn eller lösenord. Försök igen. (${loggInAttempts} av 3 försök)`;
-    validationLoggIn.style.color = "red";
-    logEvent(`Misslyckat inloggningsförsök ${loggInAttempts}.`);
-    passwordInput.value = "";
+    const username = usernameInput.value;
+    const password = passwordInput.value;
+    const basicAuthString = btoa(`${username}:${password}`);
+    const data = {
+        username: usernameInput.value,
+        password: passwordInput.value
     }
-    else {
-        validationLoggIn.textContent = "För många misslyckade försök. Försök igen senare.";
-        logEvent("Användaren har låsts ute efter 3 misslyckade inloggningsförsök.");
-    }
-    console.error("Error:", error);
-})
+    const url = "http://localhost:8080/api/v1/auth/login";
+    fetch(url, {
+            method: "POST",
+            headers: getHeaders(),
+            body: JSON.stringify(data),
+            mode: "cors",
+            credentials: "include"
+        })
+        .then((response) => {
+            if (!response.ok) throw new Error("Felaktiga inloggningsuppgifter");
+            return response.json();
+        })
+        .then(data => {
+            console.log(data);
+            validationLoggIn.textContent = "Inloggning lyckades!";
+            validationLoggIn.style.color = "green";
+            validationLoggIn.innerHTML = JSON.stringify(data);
+            loggInAttempts = 0;
+            logEvent("Användaren har loggat in.");
+
+            localStorage.setItem("isLoggedIn", "true");
+            localStorage.setItem("customerId", data.userId);
+            localStorage.setItem("isAdmin", data.isAdmin);
+            localStorage.setItem("basicAuth", basicAuthString);
+
+            const loggInForm = document.getElementById("loggInForm");
+            loggInForm.style.display = "none";
+            navContainer.style.display = "none";
+            const isAdmin = data.isAdmin;
+            if (isAdmin === true) {
+                console.log(data); //Kolla vad som kommer
+                localStorage.setItem("isAdmin", "true");
+                document.getElementById("adminNav").classList.remove("hidden");
+                document.getElementById("header1").classList.add("hidden");
+                document.getElementById("userHeader").classList.add("hidden");
+            } else {
+                localStorage.setItem("isAdmin", "false");
+                document.getElementById("header1").classList.add("hidden");
+                document.getElementById("adminNav").classList.add("hidden");
+                document.getElementById("userHeader").classList.remove("hidden");
+            }
+        })
+
+        .catch((error) => {
+            loggInAttempts++;
+            if (loggInAttempts < 3) {
+                validationLoggIn.textContent = `Felaktigt användarnamn eller lösenord. Försök igen. (${loggInAttempts} av 3 försök)`;
+                validationLoggIn.style.color = "red";
+                logEvent(`Misslyckat inloggningsförsök ${loggInAttempts}.`);
+                passwordInput.value = "";
+            } else {
+                validationLoggIn.textContent = "För många misslyckade försök. Försök igen senare.";
+                logEvent("Användaren har låsts ute efter 3 misslyckade inloggningsförsök.");
+            }
+            console.error("Error:", error);
+        })
 }
 
 const getAllUsersLink = document.querySelector('a[href="#getAllUsers"]');
@@ -212,23 +226,23 @@ const dropAdminBtn = document.getElementById("dropAdminBtn");
 
 if (dropAdminBtn) {
     dropAdminBtn.onclick = function(event) {
-        document.getElementById("myDropdown").classList.toggle("show"); 
+        document.getElementById("myDropdown").classList.toggle("show");
         event.stopPropagation();
     };
-} 
+}
 //toggla mellan att visa o ta bort menyn visuellt
-window.onclick = function(event) { 
+window.onclick = function(event) {
 
-  if (!event.target.matches('.dropAdminBtn')) { 
-    var dropdowns = document.getElementsByClassName("dropdown-content"); 
-    var i; 
-    for (i = 0; i < dropdowns.length; i++) { 
-      var openDropdown = dropdowns[i]; 
-      if (openDropdown.classList.contains('show')) { 
-        openDropdown.classList.remove('show'); 
-      } 
-    } 
-  } 
+    if (!event.target.matches('.dropAdminBtn')) {
+        var dropdowns = document.getElementsByClassName("dropdown-content");
+        var i;
+        for (i = 0; i < dropdowns.length; i++) {
+            var openDropdown = dropdowns[i];
+            if (openDropdown.classList.contains('show')) {
+                openDropdown.classList.remove('show');
+            }
+        }
+    }
 }
 
 //Anrop till hämtning av användare
@@ -242,27 +256,27 @@ if (getAllUsersBtn) {
 //Hämta alla användare
 function getAllUsers() {
     const url = "http://localhost:8080/api/v1/users";
-fetch(url, {
-    method: "GET",
-    mode: "cors",
-    credentials: "include"
-})
-.then((response) => {   
-    if (!response.ok) throw new Error("Något gick fel med att hämta användare");
-    return response.json();
-})
-.then((users) => {
-    const userList = document.getElementById("userList");
-    userList.innerHTML = "";
-    users.forEach((user) => {
-        const li = document.createElement("li");
-        li.textContent = `${user.firstName} ${user.lastName} - ${user.email} - ${user.username} - ${user.no_of_orders}`;
-        userList.appendChild(li);
-    });
-})
-.catch((error) => {
-    console.error("Error:", error);
-});
+    fetch(url, {
+            method: "GET",
+            mode: "cors",
+            credentials: "include"
+        })
+        .then((response) => {
+            if (!response.ok) throw new Error("Något gick fel med att hämta användare");
+            return response.json();
+        })
+        .then((users) => {
+            const userList = document.getElementById("userList");
+            userList.innerHTML = "";
+            users.forEach((user) => {
+                const li = document.createElement("li");
+                li.textContent = `${user.firstName} ${user.lastName} - ${user.email} - ${user.username} - ${user.no_of_orders}`;
+                userList.appendChild(li);
+            });
+        })
+        .catch((error) => {
+            console.error("Error:", error);
+        });
 }
 
 const updateUserBtn = document.getElementById("updateUserBtn");
@@ -271,105 +285,92 @@ updateUserBtn.addEventListener("click", function(event) {
     putUser();
 });
 
-let headPut = new Headers();
-headPut.append("Content-Type", "application/json");
-headPut.append("Accept", "application/json");
 
 
 function putUser() {
-const fields = {
-        "updateUserId": "Användar-ID",
-        "updateFirstName": "Förnamn",
-        "updateLastName": "Efternamn",
-        "updatePhone": "Telefonnummer",
-        "updateEmail": "E-post",
-        "updateRole": "Roll",
-        "updatePassword": "Lösenord",
-        "updateUsername": "Användarnamn",
-        "updateMsg": "Meddelande"
-    };
-
-    // Loopa igenom och varna om något saknas i HTML
-    for (let id in fields) {
-        if (!document.getElementById(id)) {
-            console.error(`FELSÖKNING: Elementet med id="${id}" (${fields[id]}) saknas helt i din HTML-kod!`);
-        }
-    }
-
+    const basicAuth = localStorage.getItem("basicAuth");
+    const isAdmin = localStorage.getItem("isAdmin") === "true";
     const userId = document.getElementById("updateUserId")?.value || "";
     const first_name = document.getElementById("updateFirstName")?.value || "";
     const last_name = document.getElementById("updateLastName")?.value || "";
     const phone = document.getElementById("updatePhone")?.value || "";
     const email = document.getElementById("updateEmail")?.value || "";
-    const role = document.getElementById("updateRole")?.value || "";
     const updatePassword = document.getElementById("updatePassword")?.value || "";
     const updateUsername = document.getElementById("updateUsername")?.value || "";
     const updateMsg = document.getElementById("updateMsg");
 
     if (updateMsg) updateMsg.textContent = "";
 
+   
 
- if (!userId) {
-    if (updateMsg) {
-        updateMsg.textContent = "Ange ett giltigt användar-ID.";
-        updateMsg.style.color = "red";
+
+    if (!userId) {
+        if (updateMsg) {
+            updateMsg.textContent = "Ange ett giltigt användar-ID.";
+            updateMsg.style.color = "red";
         }
         return;
-}
-const updateData = {
-    firstName: first_name,
-    lastName: last_name,
-    phone: phone,
-    email: email,
-    role: role,
-    username: updateUsername,
-    password: updatePassword
-};
-   
-     const url = `http://localhost:8080/api/v1/users/${userId}`;
-fetch(url, {
-    method: "PUT",
-    headers: headPut,
-    body: JSON.stringify(updateData),
-    mode: "cors",
-    credentials: "include"
-})
-.then((response) => {
-    if (!response.ok) throw new Error("Gick inte att uppdatera");
-    return response.json();
-})
-.then((data) => {
-    if (updateMsg) {
-        updateMsg.style.color = "green";
-        updateMsg.textContent = "Användaren har uppdaterats i databasen!";
-        document.getElementById("updatePutUserForm").reset();
     }
-    console.log("Uppdatering lyckades:", data);
-})
-.catch((error) => {
-    console.error("Error:", error);
-    updateMsg.textContent = "Ett fel inträffade. Försök igen senare.";
-    updateMsg.style.color = "red";
-});
+    let updateData = {
+        firstName: first_name,
+        lastName: last_name,
+        phone: phone,
+        email: email,
+        role: role,
+        username: updateUsername,
+        password: updatePassword
+    };
+    if (isAdmin) {
+        updateData.role = document.getElementById("updateRole")?.value || "";
+    }
+    const url = `http://localhost:8080/api/v1/users/${userId}`;
+    fetch(url, {
+            method: "PUT",
+            headers: getHeaders(basicAuth),
+            body: JSON.stringify(updateData),
+            mode: "cors",
+            credentials: "include"
+        })
+        .then((response) => {
+            if (!response.ok) throw new Error("Gick inte att uppdatera");
+            return response.json();
+        })
+        .then((data) => {
+            if (updateMsg) {
+                updateMsg.style.color = "green";
+                updateMsg.textContent = "Användaren har uppdaterats i databasen!";
+                document.getElementById("updatePutUserForm").reset();
+            }
+            console.log("Uppdatering lyckades:", data);
+        })
+        .catch((error) => {
+            console.error("Error:", error);
+            updateMsg.textContent = "Ett fel inträffade. Försök igen senare.";
+            updateMsg.style.color = "red";
+        });
 }
 
-const updateUser = document.querySelector('a[href="#updatePutUser"]');
-if (updateUser) {
+const updateUser = document.querySelectorAll('a[href="#updateUser"]');
+updateUser.forEach(function(updateUser) {
     updateUser.addEventListener("click", function(event) {
         event.preventDefault();
         hideAllSections();
-        const targetDiv = document.getElementById("updatePutUser");
+        const targetDiv = document.getElementById("updateUser");
         if (targetDiv) {
             targetDiv.classList.remove("hidden");
         }
-        document.getElementById("myDropdown").classList.remove("show");
+        const dropdown = document.getElementById("myDropdown");
+        if (dropdown) {
+            dropdown.classList.remove("show");
+        }
     });
-}
+});
+
 
 const deleteUserLink = document.querySelector('a[href="#deleteUser"]');
 const deleteMsg = document.getElementById("deleteMsg");
 
-if(deleteUserLink) {
+if (deleteUserLink) {
     deleteUserLink.addEventListener("click", function(event) {
         event.preventDefault();
         hideAllSections();
@@ -381,104 +382,109 @@ if(deleteUserLink) {
     });
 }
 
-let headDeleteUser = new Headers();
-headDeleteUser.append("Content-Type", "application/json");
-headDeleteUser.append("Accept", "application/json");
-
 const deleteUserBtn = document.getElementById("deleteUserBtn");
-if (deleteUserBtn){
+if (deleteUserBtn) {
     deleteUserBtn.addEventListener("click", function(event) {
-event.preventDefault();
-deleteUser();
+        event.preventDefault();
+        deleteUser();
     })
 }
 
 
 function deleteUser() {
-let id = document.getElementById("deleteUserId").value;
-const url = `http://localhost:8080/api/v1/users/${id}`;
-fetch(url, {
-    method: "DELETE",
-    headers: headDeleteUser,
-    credentials: "include"
-})
-.then((response) => {
-    if (!response.ok) throw new Error("Gick inte att ta bort användare");
-    const data = response.text();
-    if (data === null) throw new Error("Inget returnerades");
-    deleteMsg.innerHTML = JSON.stringify(data);
-    deleteMsg.style.color = "green";
-    deleteMsg.textContent = "Användaren har tagits bort!";
-    document.getElementById("deleteUserForm").reset();
-    
-})
-.catch((error) => {
-    console.error("Error:", error);
-    deleteMsg.textContent = "Gick inte att radera. Försök igen senare.";
-    deleteMsg.style.color = "red";
-});
+    let id = document.getElementById("deleteUserId").value;
+    const basicAuth = localStorage.getItem("basicAuth");
+    const url = `http://localhost:8080/api/v1/users/${id}`;
+    fetch(url, {
+            method: "DELETE",
+            headers: getHeaders(basicAuth),
+            credentials: "include"
+        })
+        .then((response) => {
+            if (!response.ok) throw new Error("Gick inte att ta bort användare");
+            const data = response.text();
+            if (data === null) throw new Error("Inget returnerades");
+            deleteMsg.innerHTML = JSON.stringify(data);
+            deleteMsg.style.color = "green";
+            deleteMsg.textContent = "Användaren har tagits bort!";
+            document.getElementById("deleteUserForm").reset();
+
+        })
+        .catch((error) => {
+            console.error("Error:", error);
+            deleteMsg.textContent = "Gick inte att radera. Försök igen senare.";
+            deleteMsg.style.color = "red";
+        });
 }
 
 
 //Hämta en specifik användare
-const getUserLink = document.querySelector('a[href="#getUser"]'); 
+const getUserLink = document.querySelector('a[href="#getUser"]');
 
-if (getUserLink) { 
-    getUserLink.addEventListener("click", function(event) { 
-        event.preventDefault(); 
-        hideAllSections(); 
-
-        const targetDiv = document.getElementById("getUser"); 
-        if (targetDiv) { 
-            targetDiv.classList.remove("hidden"); 
-        } 
-        document.getElementById("myDropdown").classList.remove("show"); 
-    }); 
-} 
-
-const getUserBtn = document.getElementById("getUserBtn"); 
-
-if (getUserBtn) { 
-    getUserBtn.addEventListener("click", function(event) { 
+if (getUserLink) {
+    getUserLink.addEventListener("click", function(event) {
         event.preventDefault();
-        getUser(); 
-    }); 
-} 
+        hideAllSections();
 
- 
-function getUser() { 
-const getUserId = document.getElementById("getUserId").value;
-const getUserMsg = document.getElementById("getUserMsg");
-const url = `http://localhost:8080/api/v1/users/${getUserId}`; 
-const userData = {
-    id: getUserId
+        const targetDiv = document.getElementById("getUser");
+        if (targetDiv) {
+            targetDiv.classList.remove("hidden");
+        }
+        document.getElementById("myDropdown").classList.remove("show");
+    });
 }
 
-fetch(url, { 
-    method: "GET", 
-    mode: "cors", 
-    credentials: "include"
-}) 
-.then((response) => {    
-    if (!response.ok) throw new Error("Något gick fel med att hämta användare"); 
-    return response.json(); 
-}) 
-.then((user) => { 
-   getUserMsg.textContent = `Användare: ${user.username} - ${user.firstName} ${user.lastName} - 
+const getUserBtn = document.getElementById("getUserBtn");
+
+if (getUserBtn) {
+    getUserBtn.addEventListener("click", function(event) {
+        event.preventDefault();
+        getUser();
+    });
+}
+
+
+function getUser() {
+    const getUserId = document.getElementById("getUserId").value;
+    const getUserMsg = document.getElementById("getUserMsg");
+    
+}
+function getOwnUser() {
+    const getUserId = localStorage.getItem("customerId");
+    const getUserMsg = document.getElementById("getOwnUserMsg");
+}
+
+function getUserGlobal(userId, getUserMsg) {
+    const url = `http://localhost:8080/api/v1/users/${getUserId}`;
+    const userData = {
+        id: getUserId
+    }
+
+    fetch(url, {
+            method: "GET",
+            mode: "cors",
+            credentials: "include"
+        })
+        .then((response) => {
+            if (!response.ok) throw new Error("Något gick fel med att hämta användare");
+            return response.json();
+        })
+        .then((user) => {
+            getUserMsg.textContent = `Användare: ${user.username} - ${user.firstName} ${user.lastName} - 
    ${user.email} - ${user.phone} - ${user.role}`;
-   document.getElementById("getUserForm").reset();
-}) 
-.catch((error) => { 
-    console.error("Error:", error); 
-}); 
-} 
+            document.getElementById("getUserForm").reset();
+        })
+        .catch((error) => {
+            console.error("Error:", error);
+        });
+}
 
 const loginLink = document.querySelector('a[href="#loggInDiv"]');
 if (loginLink) {
     loginLink.addEventListener("click", function(event) {
         event.preventDefault();
         hideAllSections();
-        
+
         const loggInDiv = document.getElementById("loggInDiv");
         if (loggInDiv) {
             loggInDiv.classList.remove("hidden");
@@ -494,7 +500,7 @@ if (createAccountLink) {
         event.preventDefault();
         hideAllSections();
         const createDiv = document.getElementById("createAccount");
-        if(createDiv) {
+        if (createDiv) {
             createDiv.classList.remove("hidden");
             document.getElementById("startPage").classList.add("hidden");
             document.querySelector(".getAllCars").classList.add("hidden");
@@ -502,21 +508,6 @@ if (createAccountLink) {
     });
 }
 
-//Länk för att komma tillbaka till startsidan, funkar inte än
-//KOLLA SEN
-const logoLink = document.querySelector('a[href="#logoLogIn"]');
-
-if (logoLink) {
-    logoLink.addEventListener("click", function(event) {
-        event.preventDefault();
-        hideAllSections();
-        
-        const startPage = document.getElementById("startPage");
-        if (startPage) {
-            startPage.classList.remove("hidden");
-        }
-    });
-}
 //skapa ny bil länk i admin
 const createCarDivLink = document.querySelector(`a[href="#createCarDiv"]`);
 if (createCarDivLink) {
@@ -533,21 +524,24 @@ if (createCarDivLink) {
 
 //Skapa ny bil
 
-document.getElementById("createCarForm").addEventListener("submit", function(event) { 
-    event.preventDefault(); 
+document.getElementById("createCarForm").addEventListener("submit", function(event) {
+    event.preventDefault();
 
-const carName = document.getElementById("carName").value;
-const model = document.getElementById("model").value;
-const feature1 = document.getElementById("feature1").value;
-const feature2 = document.getElementById("feature2").value;
-const feature3 = document.getElementById("feature3").value;
-const type = document.getElementById("type").value;
-const price = document.getElementById("price").value;
-const booked = document.getElementById("booked").checked;
+    const basicAuth = localStorage.getItem("basicAuth");
+    let headers = new Headers();
+    headers.append("Authorization", `Basic ${basicAuth}`);
+    const carName = document.getElementById("carName").value;
+    const model = document.getElementById("model").value;
+    const feature1 = document.getElementById("feature1").value;
+    const feature2 = document.getElementById("feature2").value;
+    const feature3 = document.getElementById("feature3").value;
+    const type = document.getElementById("type").value;
+    const price = document.getElementById("price").value;
+    const booked = document.getElementById("booked").checked;
 
     const formData = new FormData();
     const priceValue = parseFloat(price) || 0.0;
-     const bookedValue = (booked === true || booked === "true");
+    const bookedValue = (booked === true || booked === "true");
     formData.append("name", carName);
     formData.append("model", model);
     formData.append("feature1", feature1);
@@ -556,101 +550,105 @@ const booked = document.getElementById("booked").checked;
     formData.append("type", type);
     formData.append("price", price);
     formData.append("booked", booked);
-    
+
     const imageInput = document.getElementById("carImage");
 
     if (imageInput.files.length > 0) {
-    formData.append("image", imageInput.files[0]); 
-}
+        formData.append("image", imageInput.files[0]);
+    }
 
     const createCarMsg = document.getElementById("createCarMsg");
     createCarMsg.textContent = "";
 
     const url = "http://localhost:8080/api/v1/cars";
-    
+
     fetch(url, {
-        method: "POST",
-        body: formData,
-        credentials: "include"
-    })
-    .then((response) => {
-if (response === 204 || response.headers.get("Content-Type") === "0") {
-    return { status: response.ok, data: {} };
-}
-return response.json().then((data) => {
-    return { status: response.ok, data: data };
+            method: "POST",
+            body: formData,
+            headers: headers,
+            credentials: "include"
+        })
+        .then((response) => {
+            if (response === 204 || response.headers.get("Content-Type") === "0") {
+                return {
+                    status: response.ok,
+                    data: {}
+                };
+            }
+            return response.json().then((data) => {
+                return {
+                    status: response.ok,
+                    data: data
+                };
+            });
+        })
+        .then((result) => {
+            if (result.status) {
+                alert("Bilen har lagts till i systemet!");
+                document.getElementById("createCarForm").reset();
+            } else {
+                createCarMsg.textContent = result.data.message || "Misslyckades att lägga till bilen.";
+            }
+        })
+        .catch((error) => {
+            console.error("Error:", error);
+            createCarMsg.textContent = "Ett fel inträffade. Försök igen senare.";
+        })
 });
-    })
-    .then((result) => {
-        if (result.status) {
-            alert("Bilen har lagts till i systemet!");
-            document.getElementById("createCarForm").reset();
-        } else {
-            createCarMsg.textContent = result.data.message || "Misslyckades att lägga till bilen.";
-        }
-    })
-    .catch((error) => {
-        console.error("Error:", error);
-        createCarMsg.textContent = "Ett fel inträffade. Försök igen senare.";
-    })
-    });
 
 
-    //Hämta bil för alla
-    let headersCarGet = new Headers();
-     headersCarGet.append("Content-Type", "application/json");
-     headersCarGet.append("Accept", "application/json");
+//Hämta bil för alla
+function getCars() {
 
-    function getCars() {
     const url = "http://localhost:8080/api/v1/cars";
 
     fetch(url, {
-        method: "GET",
-        headers: headersCarGet
-    })
-    .then((response) => {
-        if (!response.ok) {
-            throw new Error(`Serverfel: ${response.status}`);
-        }
-        return response.json();
-    })
-    .then((cars) => {
+            method: "GET",
+            headers: getHeaders()
+        })
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error(`Serverfel: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then((cars) => {
 
-        currentCars = cars;
-        createTableCars(cars);
-    })
-    .catch((error) => {
-        console.error("Error:", error);
-        const carTableBody = document.getElementById("carTableBody");
-        if (carTableBody) {
-            carTableBody.innerHTML = `<tr><td colspan="9" style="color: red;">Kunde inte hämta bilar.</td></tr>`;
-        }
-    });
+            currentCars = cars;
+            createTableCars(cars);
+        })
+        .catch((error) => {
+            console.error("Error:", error);
+            const carTableBody = document.getElementById("carTableBody");
+            if (carTableBody) {
+                carTableBody.innerHTML = `<tr><td colspan="9" style="color: red;">Kunde inte hämta bilar.</td></tr>`;
+            }
+        });
 }
 
-function createTableCars (cars) {
-    
-        console.log("bilddata: ", cars[0]);
-        const carTableBody = document.getElementById("carTableBody");
-        carTableBody.innerHTML = "";
+function createTableCars(cars) {
 
-        if (cars.length === 0) {
-            carTableBody.innerHTML = `<tr><td colspan="9">Inga bilar tillgängliga</td></tr>`;
-            return;
+    console.log("bilddata: ", cars[0]);
+    const carTableBody = document.getElementById("carTableBody");
+    carTableBody.innerHTML = "";
+
+    if (cars.length === 0) {
+        carTableBody.innerHTML = `<tr><td colspan="9">Inga bilar tillgängliga</td></tr>`;
+        return;
+    }
+
+    cars.forEach((car) => {
+        let imageSrc = "";
+        if (car.image) {
+            imageSrc = `data:image/jpeg;base64,${car.image}`;
         }
 
-        cars.forEach((car) => { 
-            let imageSrc = "";
-            if (car.image) {
-                imageSrc = `data:image/jpeg;base64,${car.image}`;
-            }
+        const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+        const isAdmin = localStorage.getItem("isAdmin") === "true";
 
-            const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
-            const isAdmin = localStorage.getItem("isAdmin") === "true";
-            
-            const row = document.createElement("tr"); 
+        const row = document.createElement("tr");
 
-            row.innerHTML = `
+        row.innerHTML = `
                 <td>${car.id}</td>
                 <td>${car.name}</td>
                 <td>${car.model}</td>
@@ -663,76 +661,74 @@ function createTableCars (cars) {
                 <td><img src="${imageSrc}" alt="${car.name}" class="table-car-img" width="50"></td>
                 <td class="action-cell"></td>
             `;
-            const actionCell = row.querySelector(".action-cell");
+        const actionCell = row.querySelector(".action-cell");
 
-            if (!isLoggedIn) {
-                actionCell.innerHTML = `<span class="login">Logga in för att boka</span>`;
-            }
-            else if (isAdmin === true) {
-                const deleteBtn = document.createElement("button");
-                deleteBtn.textContent = "Ta bort";
-                deleteBtn.className = "btn-delete";
-                deleteBtn.classList.add("negativeBtn");
-                deleteBtn.addEventListener("click", (event) => {
-                    event.preventDefault();
-                    if(confirm("Vill du verkligen radera bilen " + car.id + "?")) {
-       deleteCar(car.id);
+        if (!isLoggedIn) {
+            actionCell.innerHTML = `<span class="login">Logga in för att boka</span>`;
+        } else if (isAdmin === true) {
+            const deleteBtn = document.createElement("button");
+            deleteBtn.textContent = "Ta bort";
+            deleteBtn.className = "btn-delete";
+            deleteBtn.classList.add("negativeBtn");
+            deleteBtn.addEventListener("click", (event) => {
+                event.preventDefault();
+                if (confirm("Vill du verkligen radera bilen " + car.id + "?")) {
+                    deleteCar(car.id);
+                }
+
+            });
+
+            const editButton = document.createElement("button");
+            editButton.textContent = "Redigera bil";
+            editButton.classList.add("standardBtn");
+            editButton.addEventListener("click", (event) => {
+                event.preventDefault();
+
+                hideAllSections();
+                document.getElementById("updateCarDiv").classList.remove("hidden");
+                document.getElementById("updateCarId1").value = car.id;
+                document.getElementById("updateCar1Btn").click();
+            });
+
+            actionCell.appendChild(deleteBtn);
+            actionCell.appendChild(editButton);
+        } else {
+            const bookBtn = document.createElement("button");
+            bookBtn.textContent = "Boka direkt";
+            bookBtn.className = "btn-book";
+            bookBtn.classList.add("positiveBtn");
+
+            bookBtn.addEventListener("click", (event) => {
+                event.preventDefault();
+                bookCar(car.id, `${car.name} ${car.model}`);
+            });
+            actionCell.appendChild(bookBtn);
         }
-                    
-                });
-
-                const editButton = document.createElement("button");
-                editButton.textContent = "Redigera bil";
-                editButton.classList.add("standardBtn");
-                editButton.addEventListener("click", (event) => {
-                    event.preventDefault();
-
-                    hideAllSections();
-                    document.getElementById("updateCarDiv").classList.remove("hidden");
-                    document.getElementById("updateCarId1").value = car.id;
-                    document.getElementById("updateCar1Btn").click();
-                });
-
-                actionCell.appendChild(deleteBtn);
-                actionCell.appendChild(editButton);
-            }
-            else {
-                const bookBtn = document.createElement("button");
-                bookBtn.textContent = "Boka direkt";
-                bookBtn.className = "btn-book";
-                bookBtn.classList.add("positiveBtn");
-
-                bookBtn.addEventListener("click", (event) => {
-                    event.preventDefault();
-                    bookCar(car.id, `${car.name} ${car.model}`);
-                });
-                actionCell.appendChild(bookBtn);
-            }
-            carTableBody.appendChild(row);
-        });
-    }
+        carTableBody.appendChild(row);
+    });
+}
 
 const getAllCarsLink = document.querySelectorAll('a[href=".getAllCars"]');
 
 getAllCarsLink.forEach(function(link) {
     link.addEventListener("click", function(event) {
-        event.preventDefault(); 
+        event.preventDefault();
         hideAllSections();
-        
+
         const targetDiv = document.querySelector(".getAllCars");
-        if (targetDiv) { 
-            targetDiv.classList.remove("hidden"); 
+        if (targetDiv) {
+            targetDiv.classList.remove("hidden");
         }
-        
+
         const dropdown = document.getElementById("myDropdown");
         if (dropdown) {
             dropdown.classList.remove("show");
         }
-        getCars(); 
+        getCars();
     });
 });
 
-document.addEventListener("DOMContentLoaded", () => {
+function sorteringsgrej() {
     const sortName = document.getElementById("thName");
     const sortType = document.getElementById("thType");
     const sortId = document.getElementById("thId");
@@ -755,25 +751,45 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     const isAdmin = localStorage.getItem("isAdmin") === "true";
     if (isAdmin === true) {
-const sortColumn = [
-    {id: "thId", field: "id"},
-    {id: "thModel", field: "model"},
-    {id: "thFeature1", field: "feature1"},
-    {id: "thFeature2", field: "feature2"},
-    {id: "thFeature3", field: "feature3"},
-    {id: "thPrice", field: "price"},
-    {id: "thBooked", field: "booked"}
-    ];
-sortColumn.forEach(col => {
-    const column = document.getElementById(col.id);
-    if (column) {
-        column.addEventListener("click", () => {
-            sortCarsByField(col.field);
+        const sortColumn = [{
+                id: "thId",
+                field: "id"
+            },
+            {
+                id: "thModel",
+                field: "model"
+            },
+            {
+                id: "thFeature1",
+                field: "feature1"
+            },
+            {
+                id: "thFeature2",
+                field: "feature2"
+            },
+            {
+                id: "thFeature3",
+                field: "feature3"
+            },
+            {
+                id: "thPrice",
+                field: "price"
+            },
+            {
+                id: "thBooked",
+                field: "booked"
+            }
+        ];
+        sortColumn.forEach(col => {
+            const column = document.getElementById(col.id);
+            if (column) {
+                column.addEventListener("click", () => {
+                    sortCarsByField(col.field);
+                });
+            }
         });
     }
-});
 }
-});
 
 function sortCarsByField(field) {
     if (currentCars.length === 0) return;
@@ -785,8 +801,8 @@ function sortCarsByField(field) {
         const valueA = (a[field] || "").toString();
         const valueB = (b[field] || "").toString();
 
-        if(typeof valueA === "number" && typeof valueB === "number") {
-    return direction === "asc" ? valueA - valueB : valueB - valueA;
+        if (typeof valueA === "number" && typeof valueB === "number") {
+            return direction === "asc" ? valueA - valueB : valueB - valueA;
         }
 
         const comparison = valueA.localeCompare(valueB, "sv");
@@ -798,7 +814,7 @@ function sortCarsByField(field) {
 }
 
 const deleteCarLink = document.querySelector(`a[href="#deleteCar"]`);
-if(deleteCarLink) {
+if (deleteCarLink) {
     deleteCarLink.addEventListener("click", (event) => {
         event.preventDefault();
         hideAllSections();
@@ -810,126 +826,117 @@ if(deleteCarLink) {
     });
 }
 
-const deleteCarBtn = document.getElementById("deleteCarBtn"); 
+const deleteCarBtn = document.getElementById("deleteCarBtn");
 
-if (deleteCarBtn) { 
-    deleteCarBtn.addEventListener("click", function(event) { 
+if (deleteCarBtn) {
+    deleteCarBtn.addEventListener("click", function(event) {
         event.preventDefault();
-        deleteCar(); 
-    }); 
-} 
-
-let headersDelCar = new Headers();
-headersDelCar.append("Content-Type", "application/json");
-headersDelCar.append("Accept", "application/json");
+        deleteCar();
+    });
+}
 
 //Radera bil metod
 function deleteCar(id) {
-    if(!id) { console.error("Kom inte med bilens-ID ")
+    if (!id) {
+        console.error("Kom inte med bilens-ID ")
         return;
     }
     const basicAuth = localStorage.getItem("basicAuth");
     const deleteCarMsg = document.getElementById("deleteCarMsg");
     const url = `http://localhost:8080/api/v1/cars/${id}`;
-      if (basicAuth) {
-        headersDelCar.append("Authorization", `Basic ${basicAuth}`);
-    }
-    fetch( url, {
-        method: "DELETE",
-        headers: headersDelCar,
-        credentials: "include"
-    })
-    .then((response) => {
-        if(!response.ok) throw new Error("Gick inte att ta bort bil");
-        const data = response.text();
-        if(data === null) throw new Error("Inget returneras");
-        deleteCarMsg.textContent = "Bilen har tagits bort!"
-        deleteCarMsg.style.color = "green";
-       const form = document.getElementById("deleteCarForm");
-        if(form) {
-            form.reset();
-        }
-        getCars();
-    })
-    .catch((error) => {
-        console.error("Error:", error);
-        deleteCarMsg.textContent = "Gick inte att radera. Försök igen senare.";
-        deleteCarMsg.style.color = "red";
-    });
+   
+    fetch(url, {
+            method: "DELETE",
+            headers: getHeaders(basicAuth),
+            credentials: "include"
+        })
+        .then((response) => {
+            if (!response.ok) throw new Error("Gick inte att ta bort bil");
+            const data = response.text();
+            if (data === null) throw new Error("Inget returneras");
+            deleteCarMsg.textContent = "Bilen har tagits bort!"
+            deleteCarMsg.style.color = "green";
+            const form = document.getElementById("deleteCarForm");
+            if (form) {
+                form.reset();
+            }
+            getCars();
+        })
+        .catch((error) => {
+            console.error("Error:", error);
+            deleteCarMsg.textContent = "Gick inte att radera. Försök igen senare.";
+            deleteCarMsg.style.color = "red";
+        });
 }
 //Uppdatera bokning med id
-const updateBookingBtn = document.getElementById("updateBookingBtn"); 
+const updateBookingBtn = document.getElementById("updateBookingBtn");
 
 if (updateBookingBtn) {
-    updateBookingBtn.addEventListener("click", function(event) { 
-        event.preventDefault(); 
-        putBooking(); 
-    }); 
+    updateBookingBtn.addEventListener("click", function(event) {
+        event.preventDefault();
+        putBooking();
+    });
 }
 
-let headPutBooking = new Headers(); 
-headPutBooking.append("Content-Type", "application/json"); 
-headPutBooking.append("Accept", "application/json"); 
-
-function putBooking() { 
-    const id = document.getElementById("updateBookingId")?.value || ""; 
-    const updateFromDate = document.getElementById("updateFromDate")?.value || ""; 
-    const updateToDate = document.getElementById("updateToDate")?.value || ""; 
-    const updateUserId = document.getElementById("userId")?.value || ""; 
-    const updateCarId = document.getElementById("updateCarId")?.value || ""; 
-    const active = false; 
-    const updateBookingMsg = document.getElementById("updateBookingMsg"); 
+function putBooking() {
+    const id = document.getElementById("updateBookingId")?.value || "";
+    const updateFromDate = document.getElementById("updateFromDate")?.value || "";
+    const updateToDate = document.getElementById("updateToDate")?.value || "";
+    const updateUserId = document.getElementById("userId")?.value || "";
+    const updateCarId = document.getElementById("updateCarId")?.value || "";
+    const active = false;
+    const updateBookingMsg = document.getElementById("updateBookingMsg");
     if (updateBookingMsg) {
-        updateBookingMsg.textContent = ""; 
+        updateBookingMsg.textContent = "";
     }
 
-    if (!id) { 
-        if (updateBookingMsg) { 
-            updateBookingMsg.textContent = "Ange ett giltigt boknings-ID."; 
-            updateBookingMsg.style.color = "red"; 
-        } 
-        return; 
-    } 
+    if (!id) {
+        if (updateBookingMsg) {
+            updateBookingMsg.textContent = "Ange ett giltigt boknings-ID.";
+            updateBookingMsg.style.color = "red";
+        }
+        return;
+    }
 
-    const updateData = { 
+    const updateData = {
         id: id,
         fromDate: updateFromDate,
         toDate: updateToDate,
         userId: updateUserId,
         carId: updateCarId,
         active: active
-    }; 
-    
-    const url = `http://localhost:8080/api/v1/bookings/${id}`; 
+    };
 
-    fetch(url, { 
-        method: "PUT", 
-        headers: headPutBooking,
-        body: JSON.stringify(updateData), 
-        mode: "cors", 
-        credentials: "include" 
-    }) 
-    .then((response) => { 
-        if (!response.ok) throw new Error("Gick inte att uppdatera bokningen"); 
-        return response.json(); 
-    }) 
-    .then((data) => { 
-        if (updateBookingMsg) { 
-            updateBookingMsg.style.color = "green"; 
-            updateBookingMsg.textContent = "Bokningen har uppdaterats i databasen!"; 
- 
-            const form = document.getElementById("updatePutBookingForm");
-            if (form) form.reset(); 
-        } 
-        console.log("Uppdatering av bokning lyckades:", data); 
-    }) 
-    .catch((error) => { 
-        console.error("Error:", error); 
-        if (updateBookingMsg) {
-            updateBookingMsg.textContent = "Ett fel inträffade. Försök igen senare."; 
-            updateBookingMsg.style.color = "red"; 
-        }
-    }); 
+    const url = `http://localhost:8080/api/v1/bookings/${id}`;
+
+    fetch(url, {
+            method: "PUT",
+            headers: getHeaders(basicAuth),
+            body: JSON.stringify(updateData),
+            mode: "cors",
+            credentials: "include"
+        })
+        .then((response) => {
+            if (!response.ok) throw new Error("Gick inte att uppdatera bokningen");
+            return response.json();
+        })
+        .then((data) => {
+            if (updateBookingMsg) {
+                updateBookingMsg.style.color = "green";
+                updateBookingMsg.textContent = "Bokningen har uppdaterats i databasen!";
+
+                const form = document.getElementById("updatePutBookingForm");
+                if (form) form.reset();
+            }
+            console.log("Uppdatering av bokning lyckades:", data);
+        })
+        .catch((error) => {
+            console.error("Error:", error);
+            if (updateBookingMsg) {
+                updateBookingMsg.textContent = "Ett fel inträffade. Försök igen senare.";
+                updateBookingMsg.style.color = "red";
+            }
+        });
 }
 
 //Hämta enskild bil
@@ -951,99 +958,99 @@ if (getACarUserLink) {
     getACarUserLink.addEventListener("click", function(event) {
         event.preventDefault();
         hideAllSections();
-       const targetDiv = document.getElementById("getACarUser");
+        const targetDiv = document.getElementById("getACarUser");
         if (targetDiv) {
             targetDiv.classList.remove("hidden");
         }
     });
 }
 
-const getAllCarsUserLink = document.getElementById("getAllCarsUserLink"); 
+const getAllCarsUserLink = document.getElementById("getAllCarsUserLink");
 
-if (getAllCarsUserLink) { 
-    getAllCarsUserLink.addEventListener("click", function(event) { 
-        event.preventDefault();  
-        hideAllSections(); 
+if (getAllCarsUserLink) {
+    getAllCarsUserLink.addEventListener("click", function(event) {
+        event.preventDefault();
+        hideAllSections();
 
-        const targetDiv = document.getElementById("getAllCarsList"); 
-        if (targetDiv) {  
-            targetDiv.classList.remove("hidden");  
-        } 
+        const targetDiv = document.getElementById("getAllCarsList");
+        if (targetDiv) {
+            targetDiv.classList.remove("hidden");
+        }
         getCars();
-    }); 
-} 
+    });
+}
 
-function getACar(carId, carForm, carMsg) { 
-const url = `http://localhost:8080/api/v1/cars/${carId}`; 
- 
-fetch(url, { 
-    method: "GET", 
-    credentials: "include" 
+function getACar(carId, carForm, carMsg) {
+    const url = `http://localhost:8080/api/v1/cars/${carId}`;
 
-}) 
-.then((response) => { 
-    if(!response.ok) throw new Error("Fel vid hämtning av bil"); 
-    return response.json(); 
-}) 
-.then((car) => { 
-    carMsg.textContent = `Bilen: ${car.name}, ${car.brand}, ${car.feature1}, ${car.feature2},  
-            ${car.feature3}, ${car.type}, ${car.price}. ID: ${car.id}`; 
-    const form = document.getElementById(carForm);
-    if (form) form.reset();
-}) 
-.catch((error) => { 
-    console.error("Kunde inte hitta bilen, fel: ", error); 
-    const form = document.getElementById(carForm);
-    if (form) form.reset();
-}); 
-} 
+    fetch(url, {
+            method: "GET",
+            credentials: "include"
+
+        })
+        .then((response) => {
+            if (!response.ok) throw new Error("Fel vid hämtning av bil");
+            return response.json();
+        })
+        .then((car) => {
+            carMsg.textContent = `Bilen: ${car.name}, ${car.brand}, ${car.feature1}, ${car.feature2},  
+            ${car.feature3}, ${car.type}, ${car.price}. ID: ${car.id}`;
+            const form = document.getElementById(carForm);
+            if (form) form.reset();
+        })
+        .catch((error) => {
+            console.error("Kunde inte hitta bilen, fel: ", error);
+            const form = document.getElementById(carForm);
+            if (form) form.reset();
+        });
+}
 
 // hämta bil user meny
 const getACarFormUser = document.getElementById("getACarFormUser");
-if (getACarFormUser) { 
-getACarFormUser.addEventListener("submit", function(event) { 
-    event.preventDefault(); 
+if (getACarFormUser) {
+    getACarFormUser.addEventListener("submit", function(event) {
+        event.preventDefault();
 
-    const getACarMsg2 = document.getElementById("getACarMsg2"); 
-    getACarMsg2.textContent = "";  
-const id = document.getElementById("getACarId2").value; 
-    getACar(id, "getACarFormUser", getACarMsg2); 
-}); 
+        const getACarMsg2 = document.getElementById("getACarMsg2");
+        getACarMsg2.textContent = "";
+        const id = document.getElementById("getACarId2").value;
+        getACar(id, "getACarFormUser", getACarMsg2);
+    });
 }
 //hämta bil admin meny
 const getACarForm = document.getElementById("getACarForm");
-if(getACarForm) { 
-getACarForm.addEventListener("submit", function(event) { 
-    event.preventDefault(); 
+if (getACarForm) {
+    getACarForm.addEventListener("submit", function(event) {
+        event.preventDefault();
 
-    const getACarMsg = document.getElementById("getACarMsg"); 
-    getACarMsg.textContent = ""; 
-const id = document.getElementById("getACarId").value; 
-    getACar(id, "getACarForm", getACarMsg); 
-}); 
+        const getACarMsg = document.getElementById("getACarMsg");
+        getACarMsg.textContent = "";
+        const id = document.getElementById("getACarId").value;
+        getACar(id, "getACarForm", getACarMsg);
+    });
 }
 //Funktion för bil dropdownmenyn i adminpanelen 
-const carAdminBtn = document.getElementById("carAdminBtn"); 
-if (carAdminBtn) { 
-    carAdminBtn.onclick = function(event) { 
-        document.getElementById("CarAdminDivDrop").classList.toggle("show");  
-        event.stopPropagation(); 
-    }; 
-}  
+const carAdminBtn = document.getElementById("carAdminBtn");
+if (carAdminBtn) {
+    carAdminBtn.onclick = function(event) {
+        document.getElementById("CarAdminDivDrop").classList.toggle("show");
+        event.stopPropagation();
+    };
+}
 
 //toggla mellan att visa o ta bort menyn visuellt för bilmenyn i admin
-window.onclick = function(event) {  
-  if (!event.target.matches('#carAdminBtn')) {  
-    var dropdowns = document.getElementsByClassName("dropdown-content");  
-    var i;  
-    for (i = 0; i < dropdowns.length; i++) {  
-      var openDropdown = dropdowns[i];  
-      if (openDropdown.classList.contains('show')) {  
-        openDropdown.classList.remove('show');  
-      }  
-    }  
-  }  
-} 
+window.onclick = function(event) {
+    if (!event.target.matches('#carAdminBtn')) {
+        var dropdowns = document.getElementsByClassName("dropdown-content");
+        var i;
+        for (i = 0; i < dropdowns.length; i++) {
+            var openDropdown = dropdowns[i];
+            if (openDropdown.classList.contains('show')) {
+                openDropdown.classList.remove('show');
+            }
+        }
+    }
+}
 
 //Bokningar Boka
 
@@ -1054,8 +1061,8 @@ function bookCar(carId, carName) {
     if (!isLoggedIn || isAdmin === true) {
         alert("Endast registrerade kunder kan boka bilar. Administratörer kan inte boka.");
         return;
-}
-const tableSection = document.querySelector(".getAllCars");
+    }
+    const tableSection = document.querySelector(".getAllCars");
     if (tableSection) tableSection.classList.add("hidden");
 
     const createBookingDiv = document.getElementById("createBookingDiv");
@@ -1066,43 +1073,43 @@ const tableSection = document.querySelector(".getAllCars");
 }
 //klicka boka bil från bilarna
 const bookBtn = document.getElementById("bookBtn");
- if (bookBtn) {
-        bookBtn.addEventListener("click", (event) => {
-            event.preventDefault();
-            const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
-            const isAdmin = localStorage.getItem("isAdmin") === "true";
+if (bookBtn) {
+    bookBtn.addEventListener("click", (event) => {
+        event.preventDefault();
+        const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+        const isAdmin = localStorage.getItem("isAdmin") === "true";
 
-            if (!isLoggedIn) {
-                alert("Du måste logga in som kund för att kunna boka en bil.");
-                return;
-            }
+        if (!isLoggedIn) {
+            alert("Du måste logga in som kund för att kunna boka en bil.");
+            return;
+        }
 
-            if (isAdmin === true) {
-                alert("Administratörer kan inte boka bilar. Logga in med ett kundkonto.");
-                return;
-            }
+        if (isAdmin === true) {
+            alert("Administratörer kan inte boka bilar. Logga in med ett kundkonto.");
+            return;
+        }
 
-            const tableSection = document.querySelectorAll(".getAllCars");
-            if (tableSection) {
-                tableSection.classList.add("hidden");
-            }
-            const createBookingDiv = document.getElementById("createBookingDiv");
-            if (createBookingDiv) {
-                createBookingDiv.classList.remove("hidden");
-            }
-        });
-    }
+        const tableSection = document.querySelectorAll(".getAllCars");
+        if (tableSection) {
+            tableSection.classList.add("hidden");
+        }
+        const createBookingDiv = document.getElementById("createBookingDiv");
+        if (createBookingDiv) {
+            createBookingDiv.classList.remove("hidden");
+        }
+    });
+}
 
 document.getElementById("createBookingForm").addEventListener("submit", async (event) => {
     event.preventDefault();
 
     let headersPostBooking = new Headers();
-headersPostBooking.append("Content-Type", "application/json");
-headersPostBooking.append("Accept", "application/json");
-    
-    const bookingCarId = document.getElementById("bookingCarId").value; 
-    const createFromDate = document.getElementById("createFromDate").value; 
-    const createToDate = document.getElementById("createToDate").value; 
+    headersPostBooking.append("Content-Type", "application/json");
+    headersPostBooking.append("Accept", "application/json");
+
+    const bookingCarId = document.getElementById("bookingCarId").value;
+    const createFromDate = document.getElementById("createFromDate").value;
+    const createToDate = document.getElementById("createToDate").value;
     const basicAuth = localStorage.getItem("basicAuth");
     const customerId = localStorage.getItem("customerId");
 
@@ -1110,14 +1117,14 @@ headersPostBooking.append("Accept", "application/json");
         alert("Slutdatum kan inte vara före startdatum.");
         return;
     }
-    
+
     const formData = {
         carId: parseInt(bookingCarId),
         fromDate: createFromDate,
         toDate: createToDate,
         userId: parseInt(customerId)
     };
-     if (basicAuth) {
+    if (basicAuth) {
         headersPostBooking.set("Authorization", `Basic ${basicAuth}`);
     }
 
@@ -1141,13 +1148,11 @@ headersPostBooking.append("Accept", "application/json");
             if (contentType && contentType.includes("application/json")) {
                 const errorData = await response.json();
                 alert(`Kunde inte boka: ${errorData.error || "Okänt fel"}`);
-            }
-                else {
+            } else {
                 alert(`Kunde inte boka: Servern svarade med status ${response.status}`);
-                }
             }
         }
-    catch (error) {
+    } catch (error) {
         console.error("Fel med kommunikationen, försök igen senare", error);
     }
 });
@@ -1161,7 +1166,7 @@ document.getElementById("cancelBookingBtn").addEventListener("click", () => {
 const getBookingsLink = document.querySelector('a[href="#getBookings"]');
 const getAllBookingsMsg = document.getElementById("getAllBookingsMsg");
 
-if(getBookingsLink) {
+if (getBookingsLink) {
     getBookingsLink.addEventListener("click", function(event) {
         event.preventDefault();
         hideAllSections();
@@ -1170,7 +1175,7 @@ if(getBookingsLink) {
             targetDiv.classList.remove("hidden");
         }
         document.getElementById("adminMenuCenter").classList.remove("show");
-        getAllBookings(); 
+        getAllBookings();
     });
 }
 
@@ -1184,43 +1189,43 @@ function getAllBookings() {
     headersgetAllBookings.append("Authorization", `Basic ${basicAuth}`);
 
     fetch(url, {
-        method: "GET",
-        mode: "cors",
-        credentials: "include",
-        headers: headersgetAllBookings
-    })
-    .then((response) => {
-        if (!response.ok) {
-            throw new Error(`Serverfel: `, response.json);
-        }
-        return response.json();
-    })
-    .then((bookings) => {
-        currentBookings = bookings;
-        createTableAllBookings(bookings);
-    })
-    .catch((error) => {
-        console.error("Fel: ", error);
-        const bookingTable = document.getElementById("bookingTableBody");
-        if (bookingTable) {
-            bookingTable.innerHTML = `<tr><td colspan="7" style="color: red;">Kunde inte hämta bokningar.</td></tr>`;
-        }
-    });
+            method: "GET",
+            mode: "cors",
+            credentials: "include",
+            headers: headersgetAllBookings
+        })
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error(`Serverfel: `, response.json);
+            }
+            return response.json();
+        })
+        .then((bookings) => {
+            currentBookings = bookings;
+            createTableAllBookings(bookings);
+        })
+        .catch((error) => {
+            console.error("Fel: ", error);
+            const bookingTable = document.getElementById("bookingTableBody");
+            if (bookingTable) {
+                bookingTable.innerHTML = `<tr><td colspan="7" style="color: red;">Kunde inte hämta bokningar.</td></tr>`;
+            }
+        });
 }
 
-function createTableAllBookings (bookings) {
+function createTableAllBookings(bookings) {
     const bookingTable = document.getElementById("bookingTableBody");
     bookingTable.innerHTML = "";
 
-    if(bookings.length === 0) {
+    if (bookings.length === 0) {
         bookingTable.innerHTML = `<tr><td colspan="7">Inga bokningar tillgängliga</td></tr>`;
         return;
     }
 
     bookings.forEach((booking) => {
-const isAdmin = localStorage.getItem("isAdmin") === "true";
-    const row = document.createElement("tr");
-    row.innerHTML = `
+        const isAdmin = localStorage.getItem("isAdmin") === "true";
+        const row = document.createElement("tr");
+        row.innerHTML = `
     <td>${booking.id}</td>
     <td>${booking.fromDate}</td>
     <td>${booking.toDate}</td>
@@ -1229,47 +1234,52 @@ const isAdmin = localStorage.getItem("isAdmin") === "true";
     <td>${booking.active ? "Ja" : "Nej"}</td>
     <td class="actions"></td>
     `;
-    const actionsBook = row.querySelector(".actions");
+        const actionsBook = row.querySelector(".actions");
 
-   const deleteBookingBtn = document.createElement("button");
-    deleteBookingBtn.textContent = "Radera bokning";
-    deleteBookingBtn.className = "deleteBookingBtn";
-    deleteBookingBtn.classList.add("negativeBtn");
-    deleteBookingBtn.addEventListener("click", (event) => {
-        event.preventDefault();
-        if(confirm("Vill du verkligen radera bokning " + booking.id + "?")) {
-               
-        deleteBooking(booking.id)
-        }
+        const deleteBookingBtn = document.createElement("button");
+        deleteBookingBtn.textContent = "Radera bokning";
+        deleteBookingBtn.className = "deleteBookingBtn";
+        deleteBookingBtn.classList.add("negativeBtn");
+        deleteBookingBtn.addEventListener("click", (event) => {
+            event.preventDefault();
+            if (confirm("Vill du verkligen radera bokning " + booking.id + "?")) {
+
+                deleteBooking(booking.id)
+            }
+        });
+        const updateBtn = document.createElement("button");
+        updateBtn.textContent = "Uppdatera";
+        updateBtn.classList.add("standardBtn");
+        updateBtn.addEventListener("click", (event) => {
+            event.preventDefault();
+            hideAllSections();
+            const updateSection = document.getElementById("updateBooking");
+            if (updateSection) {
+                updateSection.classList.remove("hidden");
+            }
+            const updateBookingId = document.getElementById("updateBookingId");
+            updateBookingId.value = booking.id;
+            updateBookingId.readOnly = true;
+            document.getElementById("updateBookingFromDate").value = booking.fromDate;
+            document.getElementById("updateBookingToDate").value = booking.toDate;
+            document.getElementById("updateBookingUserId").value = booking.userId;
+            document.getElementById("updateBookingCarId").value = booking.carId;
+            document.getElementById("updateBookingActive").value = booking.booked ? "Ja" : "Nej";
+        });
+
+        actionsBook.appendChild(updateBtn);
+        actionsBook.appendChild(deleteBookingBtn);
+        bookingTable.appendChild(row);
     });
-    const updateBtn = document.createElement("button");
-    updateBtn.textContent = "Uppdatera";
-    updateBtn.classList.add("standardBtn");
-    updateBtn.addEventListener("click", (event) => {
-        event.preventDefault();
-        hideAllSections();
-      const updateSection = document.getElementById("updateBooking");
-    if (updateSection) {
-        updateSection.classList.remove("hidden");
-    }
-    const updateBookingId = document.getElementById("updateBookingId");
-    updateBookingId.value = booking.id;
-    updateBookingId.readOnly = true;
-    document.getElementById("updateBookingFromDate").value = booking.fromDate;
-    document.getElementById("updateBookingToDate").value = booking.toDate;
-    document.getElementById("updateBookingUserId").value = booking.userId;
-    document.getElementById("updateBookingCarId").value = booking.carId;
-    document.getElementById("updateBookingActive").value = booking.booked ? "Ja" : "Nej";
-});
-   
-    actionsBook.appendChild(updateBtn);
-    actionsBook.appendChild(deleteBookingBtn);
-    bookingTable.appendChild(row);
-    });
-    
+
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+    sorteringsgrej();
+    sortBookings();
+});
+
+function sortBookings() {
     const sortId = document.getElementById("thBookingId");
     const sortFromDate = document.getElementById("thFromDate");
     const sortToDate = document.getElementById("thToDate");
@@ -1277,24 +1287,41 @@ document.addEventListener("DOMContentLoaded", () => {
     const sortCarId = document.getElementById("thCarId");
     const sortActive = document.getElementById("thActive");
 
-    const sortColumn = [
-    {id: "thBookingId", field: "id"},
-    {id: "thFromDate", field: "fromDate"},
-    {id: "thToDate", field: "toDate"},
-    {id: "thUserId", field: "userId"},
-    {id: "thCarId", field: "carId"},
-    {id: "thActive", field: "active"},
+    const sortColumn = [{
+            id: "thBookingId",
+            field: "id"
+        },
+        {
+            id: "thFromDate",
+            field: "fromDate"
+        },
+        {
+            id: "thToDate",
+            field: "toDate"
+        },
+        {
+            id: "thUserId",
+            field: "userId"
+        },
+        {
+            id: "thCarId",
+            field: "carId"
+        },
+        {
+            id: "thActive",
+            field: "active"
+        },
     ];
-sortColumn.forEach(col => {
-    const column = document.getElementById(col.id);
-    if (column) {
-        column.addEventListener("click", () => {
-            sortBookingsByField(col.field);
-        });
-    }
-});
+    sortColumn.forEach(col => {
+        const column = document.getElementById(col.id);
+        if (column) {
+            column.addEventListener("click", () => {
+                sortBookingsByField(col.field);
+            });
+        }
+    });
     searchBooking();
-  
+
     const activeBookingBtn = document.getElementById("activeBookingBtn");
     if (activeBookingBtn) {
         activeBookingBtn.addEventListener("click", () => {
@@ -1307,7 +1334,7 @@ sortColumn.forEach(col => {
             searchUsersBooking();
         });
     }
-});
+}
 
 function searchBooking() {
     const searchBookingForm = document.getElementById("searchBookingForm");
@@ -1318,7 +1345,7 @@ function searchBooking() {
     if (searchBookingForm) {
         searchBookingForm.addEventListener("submit", (event) => {
             event.preventDefault();
-            
+
             const searchValue = getBookingId.value.trim();
             if (searchBookingMsg) searchBookingMsg.textContent = "";
 
@@ -1326,7 +1353,7 @@ function searchBooking() {
                 createTableAllBookings(currentBookings);
                 return;
             }
-            const filteredBookings = currentBookings.filter(booking => 
+            const filteredBookings = currentBookings.filter(booking =>
                 booking.id && booking.id.toString() === searchValue
             );
             createTableAllBookings(filteredBookings);
@@ -1351,14 +1378,16 @@ function searchUsersBooking() {
     const basicAuth = localStorage.getItem("basicAuth");
     const searchMsg = document.getElementById("searchUsersBookingMsg");
     const userId = document.getElementById("searchUsersBooking").value.trim();
-    if(!userId) {
-  searchMsg.textContent = "Ange ett giltigt användar-id";
-  return;
+    if (!userId) {
+        searchMsg.textContent = "Ange ett giltigt användar-id";
+        return;
     }
 
     const url = `http://localhost:8080/api/v1/bookings/user/${userId}`;
-    
-    if (searchMsg) { searchMsg.textContent = "Hämtar alla aktiva bokningar.."; }
+
+    if (searchMsg) {
+        searchMsg.textContent = "Hämtar alla aktiva bokningar..";
+    }
 
     let headers = new Headers();
     headers.append("Content-Type", "application/json");
@@ -1368,33 +1397,37 @@ function searchUsersBooking() {
     }
 
     fetch(url, {
-        headers: headers,
-        mode: "cors",
-        credentials: "include",
-        method: "GET"
-    })
-    .then((response) => {
-        if (!response.ok) { throw new Error(`Fel med server: ${response.status}`); }
-        return response.json();
-    })
-    .then((bookings) => {
-        if (searchMsg) searchMsg.textContent = "";
-        createTableAllBookings(bookings);
-    })
-    .catch((error) => {
-        console.error("Fel vid hämtning av bokningar", error);
-        if (searchMsg) {
-            searchMsg.textContent = "Kunde inte hämta bokningar.";
-            searchMsg.style.color = "red";
-        }
-    });
+            headers: headers,
+            mode: "cors",
+            credentials: "include",
+            method: "GET"
+        })
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error(`Fel med server: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then((bookings) => {
+            if (searchMsg) searchMsg.textContent = "";
+            createTableAllBookings(bookings);
+        })
+        .catch((error) => {
+            console.error("Fel vid hämtning av bokningar", error);
+            if (searchMsg) {
+                searchMsg.textContent = "Kunde inte hämta bokningar.";
+                searchMsg.style.color = "red";
+            }
+        });
 }
 //Sök aktiva bokningar
 function searchActiveBooking() {
     const basicAuth = localStorage.getItem("basicAuth");
     const url = `http://localhost:8080/api/v1/bookings/active`;
     const searchMsg = document.getElementById("searchBookingMsg");
-    if (searchMsg) { searchMsg.textContent = "Hämtar alla aktiva bokningar.."; }
+    if (searchMsg) {
+        searchMsg.textContent = "Hämtar alla aktiva bokningar..";
+    }
 
     let headersActive = new Headers();
     headersActive.append("Content-Type", "application/json");
@@ -1404,26 +1437,28 @@ function searchActiveBooking() {
     }
 
     fetch(url, {
-        headers: headersActive,
-        mode: "cors",
-        credentials: "include",
-        method: "GET"
-    })
-    .then((response) => {
-        if (!response.ok) { throw new Error(`Fel med server: ${response.status}`); }
-        return response.json();
-    })
-    .then((activeBookings) => {
-        if (searchMsg) searchMsg.textContent = "";
-        createTableAllBookings(activeBookings);
-    })
-    .catch((error) => {
-        console.error("Fel vid hämtning av aktiva bokningar", error);
-        if (searchMsg) {
-            searchMsg.textContent = "Kunde inte hämta aktiva bokningar.";
-            searchMsg.style.color = "red";
-        }
-    });
+            headers: headersActive,
+            mode: "cors",
+            credentials: "include",
+            method: "GET"
+        })
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error(`Fel med server: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then((activeBookings) => {
+            if (searchMsg) searchMsg.textContent = "";
+            createTableAllBookings(activeBookings);
+        })
+        .catch((error) => {
+            console.error("Fel vid hämtning av aktiva bokningar", error);
+            if (searchMsg) {
+                searchMsg.textContent = "Kunde inte hämta aktiva bokningar.";
+                searchMsg.style.color = "red";
+            }
+        });
 }
 
 //Sortera bokningar
@@ -1437,14 +1472,14 @@ function sortBookingsByField(field) {
         const valueA = (a[field] || "").toString();
         const valueB = (b[field] || "").toString();
 
-        if(typeof valueA === "boolean" && typeof valueB === "boolean") {
-    return direction === "asc" ? (valueA === valueB ? 0 : valueA ? -1 : 1) : (valueA === valueB ? 0 : valueA ? 1 : -1);
+        if (typeof valueA === "boolean" && typeof valueB === "boolean") {
+            return direction === "asc" ? (valueA === valueB ? 0 : valueA ? -1 : 1) : (valueA === valueB ? 0 : valueA ? 1 : -1);
         }
 
         const strA = (valueA || "").toString();
         const strB = (valueB || "").toString();
 
-        if(!isNaN(strA) && !isNaN(strB) && strA !== "" && strB !== "") {
+        if (!isNaN(strA) && !isNaN(strB) && strA !== "" && strB !== "") {
             return direction === "asc" ? valueA - valueB : valueB - valueA;
         }
 
@@ -1455,41 +1490,43 @@ function sortBookingsByField(field) {
     createTableAllBookings(currentBookings);
 }
 //Sök på enskild bokning med angivet id
-function searchBookingForUser() { 
-const id = document.getElementById()
-const basicAuth = localStorage.getItem("basicAuth");
-const searchMsg = document.getElementById("searchBookingForUserMsg");
-const url = `http://localhost:8080/api/v1/bookings/${id}`;
+function searchBookingForUser() {
+    const id = document.getElementById()
+    const basicAuth = localStorage.getItem("basicAuth");
+    const searchMsg = document.getElementById("searchBookingForUserMsg");
+    const url = `http://localhost:8080/api/v1/bookings/${id}`;
 
-let headers = new Headers();
-headers.append("Content-Type", "application/json");
-headers.append("Accept", "application/json");
-if (basicAuth) {
-    headers.set("Authorization", `BasicAuth ${basicAuth}`);
+    let headers = new Headers();
+    headers.append("Content-Type", "application/json");
+    headers.append("Accept", "application/json");
+    if (basicAuth) {
+        headers.set("Authorization", `BasicAuth ${basicAuth}`);
+    }
+
+    fetch(url, {
+            headers: headers,
+            mode: "cors",
+            credentials: "include",
+            method: "GET"
+        })
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error(`Serverfel: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then((boookings) => {
+            if (searchMsg) searchMsg.textContent = "";
+            //Skapa tabbell för bokningarna funktion
+        })
+        .catch((error) => {
+            console.error("Fel vid hämtning av bokning", error);
+            if (searchMsg) {
+                searchMsg.textContent = "Kunde inte hämta bokning.";
+                searchMsg.style.color = "red";
+            }
+        });
 }
-
-fetch(url, { 
-headers: headers,
-mode: "cors",
-credentials: "include",
-method: "GET"
-})
-.then((response) => { 
-if(!response.ok) { throw new Error(`Serverfel: ${response.status}`);} 
-return response.json(); 
-})
-.then((boookings) => {
-if(searchMsg) searchMsg.textContent = "";
-   //Skapa tabbell för bokningarna funktion
-   })
-   .catch((error) => {
-   console.error("Fel vid hämtning av bokning", error);
-        if (searchMsg) {
-            searchMsg.textContent = "Kunde inte hämta bokning.";
-            searchMsg.style.color = "red";
-        }
-    });
- }
 
 
 //Hämta alla bokningar för inloggad användare
@@ -1498,61 +1535,63 @@ function myBookings() {
     const id = localStorage.getItem("customerId");
     const basicAuth = localStorage.getItem("basicAuth");
     const url = `http://localhost:8080/api/v1/bookings/me`;
-     let headersMyBooking = new Headers();
+    let headersMyBooking = new Headers();
     headersMyBooking.append("Content-Type", "application/json");
     headersMyBooking.append("Accept", "application/json");
     headersMyBooking.append("Authorization", `Basic ${basicAuth}`);
-    
-fetch(url, {
-    method: "GET",
-    mode: "cors",
-    credentials: "include",
-    headers: headersMyBooking
-})
-.then((response) => {   
-    if (response.status === 404) {
-            return [];
-        }
-    if (!response.ok) { throw new Error("Något gick fel med att hämta bokning."); }
-    return response.json();
-})
-.then((bookings) => {
-    currentBookings = bookings;
-    createTableUsers(bookings);
-})
-.catch((error) => {
-    console.error("Gick inte att hämta bokningar:", error);
-});
+
+    fetch(url, {
+            method: "GET",
+            mode: "cors",
+            credentials: "include",
+            headers: headersMyBooking
+        })
+        .then((response) => {
+            if (response.status === 404) {
+                return [];
+            }
+            if (!response.ok) {
+                throw new Error("Något gick fel med att hämta bokning.");
+            }
+            return response.json();
+        })
+        .then((bookings) => {
+            currentBookings = bookings;
+            createTableUsers(bookings);
+        })
+        .catch((error) => {
+            console.error("Gick inte att hämta bokningar:", error);
+        });
 }
 
 const myBookingsLink = document.getElementById("myBookingsLink");
 if (myBookingsLink) {
-myBookingsLink.addEventListener("click", function(event) {
-    event.preventDefault();
-    hideAllSections();
-    const targetDiv = document.getElementById("myBookings");
-    if (targetDiv) {
-        targetDiv.classList.remove("hidden");
-    }
-myBookings();
-searchBookingUsers();
-});
+    myBookingsLink.addEventListener("click", function(event) {
+        event.preventDefault();
+        hideAllSections();
+        const targetDiv = document.getElementById("myBookings");
+        if (targetDiv) {
+            targetDiv.classList.remove("hidden");
+        }
+        myBookings();
+        searchBookingUsers();
+    });
 }
 
 function createTableUsers(bookings) {
     const bookingsTableBody = document.getElementById("userBookingsTableBody");
 
     if (bookingsTableBody) {
-            bookingsTableBody.innerHTML = "";
-            if (!bookings || bookings.length === 0) {
-                bookingsTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center;">Du har inga bokningar ännu.</td></tr>`;
+        bookingsTableBody.innerHTML = "";
+        if (!bookings || bookings.length === 0) {
+            bookingsTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center;">Du har inga bokningar ännu.</td></tr>`;
             return;
-            }
+        }
 
-    bookings.forEach((booking) => {
+        bookings.forEach((booking) => {
 
-        const row = document.createElement("tr");
-       const idCell = document.createElement("td");
+            const row = document.createElement("tr");
+            const idCell = document.createElement("td");
             idCell.textContent = booking.id;
 
             const fromCell = document.createElement("td");
@@ -1585,35 +1624,35 @@ function searchBookingUsers() {
     const searchMsg = document.getElementById("searchBookingForUserMsg");
     const clearBtn = document.getElementById("searchBookingForUserClearBtn");
 
-    if(searchForm) {
-        if(searchForm.getAttribute("data-listener") === "true") {
+    if (searchForm) {
+        if (searchForm.getAttribute("data-listener") === "true") {
             return;
         }
     }
 
     searchForm.setAttribute("data-listener", "true");
-    
-        searchForm.addEventListener("submit", (event) => {
-            event.preventDefault();
-            
-            const searchValue = bookingId.value.trim();
-            if (searchMsg) searchMsg.textContent = "";
 
-            if (searchValue === "") {
-                createTableUsers(currentBookings);
-                return;
-            }
-            const filteredBookings = currentBookings.filter(booking => 
-                booking.id && booking.id.toString() === searchValue
-            );
-            createTableUsers(filteredBookings);
+    searchForm.addEventListener("submit", (event) => {
+        event.preventDefault();
 
-            if (filteredBookings.length === 0 && searchMsg) {
-                searchMsg.textContent = "Ingen bokning matchade det ID:t.";
-                searchMsg.style.color = "red";
-            }
-        });
-      if (clearBtn) {
+        const searchValue = bookingId.value.trim();
+        if (searchMsg) searchMsg.textContent = "";
+
+        if (searchValue === "") {
+            createTableUsers(currentBookings);
+            return;
+        }
+        const filteredBookings = currentBookings.filter(booking =>
+            booking.id && booking.id.toString() === searchValue
+        );
+        createTableUsers(filteredBookings);
+
+        if (filteredBookings.length === 0 && searchMsg) {
+            searchMsg.textContent = "Ingen bokning matchade det ID:t.";
+            searchMsg.style.color = "red";
+        }
+    });
+    if (clearBtn) {
         clearBtn.addEventListener("click", () => {
             if (bookingId) bookingId.value = "";
             if (searchMsg) searchMsg.textContent = "";
@@ -1623,8 +1662,8 @@ function searchBookingUsers() {
 }
 
 //Uppdatera bil
-let headPutCar = new Headers(); 
-headPutCar.append("Content-Type", "application/json"); 
+let headPutCar = new Headers();
+headPutCar.append("Content-Type", "application/json");
 headPutCar.append("Accept", "application/json");
 
 const updateCar1Btn = document.getElementById("updateCar1Btn");
@@ -1635,9 +1674,9 @@ if (updateCar1Btn) {
         const updateMsg = document.getElementById("updateCar1Msg");
         const basicAuth = localStorage.getItem("basicAuth");
 
-if (basicAuth) { 
-        headPutCar.set("Authorization", `Basic ${basicAuth}`); 
-    } 
+        if (basicAuth) {
+            headPutCar.set("Authorization", `Basic ${basicAuth}`);
+        }
 
         if (!carId) {
             updateMsg.innerText = "Mata in giltigt id.";
@@ -1645,20 +1684,19 @@ if (basicAuth) {
         }
         const url = `http://localhost:8080/api/v1/cars/${carId}`;
         fetch(url, {
-            method: "GET",
-            headers: headPutCar
-        }
-        )
-        .then(response => {
-            if (!response.ok) {
-                throw new Error("Bilen hittades inte");
-            }
-            return response.json();
-        })
-        .then(car => {
-            updateMsg.innerText = "";
+                method: "GET",
+                headers: headPutCar
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Bilen hittades inte");
+                }
+                return response.json();
+            })
+            .then(car => {
+                updateMsg.innerText = "";
 
-            document.getElementById("updateCarId").value = car.id || carId;
+                document.getElementById("updateCarId").value = car.id || carId;
                 document.getElementById("updateCarId").disabled = true;
                 document.getElementById("updateCarName").value = car.name || "";
                 document.getElementById("updateModel").value = car.model || "";
@@ -1671,12 +1709,12 @@ if (basicAuth) {
 
                 document.getElementById("updateCarDiv").classList.add("hidden");
                 document.getElementById("updateCar").classList.remove("hidden");
-        })
-        .catch(error => {
+            })
+            .catch(error => {
                 updateMsg.style.color = "red";
                 updateMsg.innerText = "Kunde inte hämta bilen. Kontrollera att ID:t är rätt.";
                 console.error(error);
-      });
+            });
     });
 }
 
@@ -1685,10 +1723,10 @@ const updateCarBtn = document.getElementById("updateCarBtn");
 if (updateCarBtn) {
     updateCarBtn.addEventListener("click", function(event) {
         event.preventDefault();
-        
+
         const carId = document.getElementById("updateCarId").value;
         const msgElement = document.getElementById("updateCarMsg");
-         const basicAuth = localStorage.getItem("basicAuth");
+        const basicAuth = localStorage.getItem("basicAuth");
 
         const updatedCar = {
             id: carId,
@@ -1702,53 +1740,53 @@ if (updateCarBtn) {
             booked: document.getElementById("updateBooked").value
         };
 
-       const url = `http://localhost:8080/api/v1/cars/${carId}`;
-       if (basicAuth) { 
-        headPutCar.set("Authorization", `Basic ${basicAuth}`); 
-    } 
+        const url = `http://localhost:8080/api/v1/cars/${carId}`;
+        if (basicAuth) {
+            headPutCar.set("Authorization", `Basic ${basicAuth}`);
+        }
         fetch(url, {
-    method: "PUT",
-    headers: headPutCar,
-    body: JSON.stringify(updatedCar),
-    mode: "cors",
-    
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error("Kunde inte uppdatera bilen.");
-            }
-            return response.json();
-        })
-        .then(data => {
-            msgElement.style.color = "green";
-            msgElement.innerText = "Bilen har uppdaterats!";
-            
-            setTimeout(() => {
-                hideAllSections();
-                 document.getElementById("getAllCars").classList.remove("hidden");
-                 getCars();
-            }, 2000);
-        })
-        .catch(error => {
-            msgElement.style.color = "red";
-            msgElement.innerText = "Ett fel uppstod vid uppdateringen.";
-            console.error(error);
-        });
+                method: "PUT",
+                headers: headPutCar,
+                body: JSON.stringify(updatedCar),
+                mode: "cors",
+
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Kunde inte uppdatera bilen.");
+                }
+                return response.json();
+            })
+            .then(data => {
+                msgElement.style.color = "green";
+                msgElement.innerText = "Bilen har uppdaterats!";
+
+                setTimeout(() => {
+                    hideAllSections();
+                    document.getElementById("getAllCarsList").classList.remove("hidden");
+                    getCars();
+                }, 2000);
+            })
+            .catch(error => {
+                msgElement.style.color = "red";
+                msgElement.innerText = "Ett fel uppstod vid uppdateringen.";
+                console.error(error);
+            });
     });
 }
 
-const updateCarLink = document.querySelector(`a[href="#updateCarDiv"]`); 
-if(updateCarLink) { 
-    updateCarLink.addEventListener("click", (event) => { 
-        event.preventDefault(); 
-        hideAllSections(); 
-        const targetDiv = document.getElementById("updateCarDiv"); 
-        if (targetDiv) { 
-            targetDiv.classList.remove("hidden"); 
-        } 
-        document.getElementById("CarAdminDivDrop").classList.remove("show"); 
-    }); 
-} 
+const updateCarLink = document.querySelector(`a[href="#updateCarDiv"]`);
+if (updateCarLink) {
+    updateCarLink.addEventListener("click", (event) => {
+        event.preventDefault();
+        hideAllSections();
+        const targetDiv = document.getElementById("updateCarDiv");
+        if (targetDiv) {
+            targetDiv.classList.remove("hidden");
+        }
+        document.getElementById("CarAdminDivDrop").classList.remove("show");
+    });
+}
 
 
 let headersDelBooking = new Headers();
@@ -1757,54 +1795,55 @@ headersDelBooking.append("Accept", "application/json");
 
 //Radera bokning metod
 function deleteBooking(id) {
-    if(!id) { console.error("Kom inte med bokningens-ID ")
+    if (!id) {
+        console.error("Kom inte med bokningens-ID ")
         return;
     }
     const basicAuth = localStorage.getItem("basicAuth");
     const deleteBookingMsg = document.getElementById("deleteBookingMsg");
     const url = `http://localhost:8080/api/v1/bookings/${id}`;
-      if (basicAuth) {
+    if (basicAuth) {
         headersDelBooking.set("Authorization", `Basic ${basicAuth}`);
     }
-    fetch( url, {
-        method: "DELETE",
-        mode: "cors",
-        headers: headersDelBooking,
-        credentials: "include"
-    })
-    .then((response) => {
-if(response.ok) {
- deleteBookingMsg.textContent = "Bokningen har tagits bort!"
-        deleteBookingMsg.style.color = "green";
-        getAllBookings();
-        const form = document.getElementById("deleteBookingForm");
-        if(form) {
-            form.reset();
-        }
-        return;
-  }
+    fetch(url, {
+            method: "DELETE",
+            mode: "cors",
+            headers: headersDelBooking,
+            credentials: "include"
+        })
+        .then((response) => {
+            if (response.ok) {
+                deleteBookingMsg.textContent = "Bokningen har tagits bort!"
+                deleteBookingMsg.style.color = "green";
+                getAllBookings();
+                const form = document.getElementById("deleteBookingForm");
+                if (form) {
+                    form.reset();
+                }
+                return;
+            }
 
             throw new Error("Gick inte att ta bort bokning");
-    })
-    .catch((error) => {
-        console.error("Error:", error);
-        deleteBookingMsg.textContent = "Gick inte att radera. Försök igen senare.";
-        deleteBookingMsg.style.color = "red";
-    });
+        })
+        .catch((error) => {
+            console.error("Error:", error);
+            deleteBookingMsg.textContent = "Gick inte att radera. Försök igen senare.";
+            deleteBookingMsg.style.color = "red";
+        });
 }
 
 
 
 document.addEventListener("DOMContentLoaded", () => {
-const logoutLink = document.querySelectorAll(".logoutLink");
+    const logoutLink = document.querySelectorAll(".logoutLink");
 
-logoutLink.forEach(link => {
-    link.addEventListener("click", function(event) {
-        event.preventDefault();
-localStorage.removeItem("isLoggedIn");
-        localStorage.removeItem("isAdmin");
-        localStorage.removeItem("basicAuth");
-        window.location.reload();
+    logoutLink.forEach(link => {
+        link.addEventListener("click", function(event) {
+            event.preventDefault();
+            localStorage.removeItem("isLoggedIn");
+            localStorage.removeItem("isAdmin");
+            localStorage.removeItem("basicAuth");
+            window.location.reload();
+        });
     });
-});
 })
