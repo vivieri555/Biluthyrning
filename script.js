@@ -514,6 +514,10 @@ function sortUsers() {
             id: "thLastName", 
             field: "lastName" 
         }, 
+        {
+            id: "thUsername",
+            field: "username"
+        },
         { 
             id: "thPhone", 
             field: "phone" 
@@ -541,8 +545,6 @@ function sortUsers() {
             } 
         }); 
 }
-
-   //Lägga in anrop till sök funktion för användare? 
 
 function deleteUser() {
     let id = document.getElementById("deleteUserId").value;
