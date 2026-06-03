@@ -39,6 +39,7 @@
                         <a href="#getACar">Hämta specifik bil</a>
                         <a href="#updateCarDiv">Ändra på en befintlig bil</a>
                         <a href="#deleteCar">Radera bil</a>
+                        <a href="#returnCarDiv">Returnera bil</a>
                     </div>
                 </li>
                 
@@ -47,7 +48,7 @@
   <div id="myDropdown" class="dropdown-content"> 
     <a href="#createAccount2">Skapa ny användare</a> 
     <a href="#getAllUsers">Hämta alla användare</a> 
-    <a href="#updateUser">Uppdatera användare</a> 
+    <a href="#getUserForUpdate">Uppdatera användare</a> 
     <a href="#deleteUser">Ta bort användare</a>
     <a href="#getUser">Hämta specifik användare</a>
   </div> 
@@ -66,7 +67,7 @@
     <div id="userMenuCenter">
         <ul class="userNavClass">
             <li><a href="#getAllCars" id="getAllCarsUserLink">Se och boka bilar</a></li>
-            <li><a href="#updateUser">Användarprofil</a></li>
+            <li><a href="#getUserForUpdate">Användarprofil</a></li>
             <li><a href="#getACarUser" id="getACarUserLink">Hämta en specifik bil</a></li>
             <li><a href="#myBookings" id="myBookingsLink">Se dina bokningar</a></li>
             <li><a href="">Hämta en enskild bokning med id?</a></li>
@@ -100,7 +101,27 @@
     <div id="getAllUsers" class="hidden">
         <h2>Hämta alla användare här</h2>
         <button id="getAllUsersBtn" class="standardBtn">Läs in användare</button>
-        <ul id="userList"></ul>
+        <div class="usersTableDiv">
+            <table>
+                <thead>
+                    <tr>
+                        <th id="thGetAllUserId">Id</th>
+                        <th id="thFirstName">Förnamn</th>
+                        <th id="thLastName">Efternamn</th>
+                        <th id="thUsername">Användarnamn</th>
+                        <th id="thPhone">Telefon</th>
+                        <th id="thEmail">Email</th>
+                        <th id="thNoOfOrders">Antal bokningar</th>
+                        <th id="thRole">Roll</th>
+                    </tr>
+                </thead>
+                <tbody id="usersTable">
+                    <tr>
+                        <td colspan="8">Laddar användare...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
 
@@ -127,11 +148,6 @@
 
 <label for="updateEmail">E-post:</label>
 <input type="email" id="updateEmail" name="updateEmail"><br>
-
-
-    <label for="updateRole">Roll:</label>
-    <input type="text" id="updateRole" name="updateRole"><br>
-
 
         <button id="updateUserBtn" class="positiveBtn">Spara</button>
 
@@ -230,6 +246,17 @@
         <input type="text" id="getUserId" name="getUserId"><br>
         <button id="getUserBtn" class="standardBtn">Hämta</button>
         <p id="getUserMsg"></p>
+    </form>
+    </div>
+
+    <!-- Hämta användare som ska uppdateras Admin -->
+    <div id="getUserForUpdate" class="hidden">
+    <h2>Vilken användare vill du uppdatera?</h2>
+    <form id="getUserForUpdateForm">
+        <label for="getUserUpdateId">Användar-ID:</label>
+        <input type="text" id="getUserUpdateId" name="getUserUpdateId"><br>
+        <button id="getUserUpdateBtn" class="standardBtn">Hämta</button>
+        <p id="getUserUpdateMsg"></p>
     </form>
     </div>
 
@@ -457,6 +484,16 @@
                 </tbody>
             </table>
         </div>
+    </div>
+
+    <div id="returnCarDiv" class="hidden">
+        <h2>Lämna tillbaka bilen</h2>
+        <form id="returnCarForm">
+            <label for="returnId">Ange bokningens-id som ska returneras:</label>
+            <input type="text" id="returnId" name="returnId">
+            <button type="submit" id="returnBtn">Returnera</button>
+            <p id="returnMsg"></p>
+        </form>
     </div>
 
 </div>

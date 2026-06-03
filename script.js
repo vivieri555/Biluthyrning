@@ -17,14 +17,15 @@ function getHeaders(auth) {
 }
 let currentCars = [];
 let currentBookings = [];
+let currentUsers = [];
 let sortDirections = {
     name: "asc",
     type: "asc"
 };
 
 function hideAllSections() {
-    const sections = ["loggInDiv", "createAccount", "createAccount2", "getAllUsers", "updatePutUser", "updateUser",
-        "deleteUser", "getUser", "getAllCarsList", "getACar", "deleteCar",
+    const sections = ["loggInDiv", "createAccount", "createAccount2", "getAllUsers", "updatePutUser", "updateUser", "getUserForUpdate",
+        "deleteUser", "getUser", "getAllCarsList", "getACar", "deleteCar", "returnCarDiv",
         "createCarDiv", "createBookingDiv", "bookBtn", "myBookings", "getACarUser", "updateCarDiv", "updateCar", "getBookings", "updateBooking"
     ];
     sections.forEach(id => {
@@ -256,8 +257,11 @@ if (getAllUsersBtn) {
 //Hämta alla användare
 function getAllUsers() {
     const url = "http://localhost:8080/api/v1/users";
+    const basicAuth = localStorage.getItem("basicAuth");
+
     fetch(url, {
             method: "GET",
+            headers: getHeaders(basicAuth),
             mode: "cors",
             credentials: "include"
         })
@@ -266,17 +270,63 @@ function getAllUsers() {
             return response.json();
         })
         .then((users) => {
-            const userList = document.getElementById("userList");
-            userList.innerHTML = "";
-            users.forEach((user) => {
-                const li = document.createElement("li");
-                li.textContent = `${user.firstName} ${user.lastName} - ${user.email} - ${user.username} - ${user.no_of_orders}`;
-                userList.appendChild(li);
-            });
-        })
+            currentUsers = users;
+            createTableAllUsers(users);
+            })
         .catch((error) => {
             console.error("Error:", error);
+            const userTable = document.getElementById("usersTable");
+            userTable.innerHTML = `<tr><td colspan="8" style="color: red;"> Kan inte hämta användare
+            </td></tr>`;
         });
+}
+//skapa tabell för alla användare i admin menyn
+function createTableAllUsers(users){
+    const userTable = document.getElementById("usersTable");
+    userTable.innerHTML = "";
+
+    if (users.length === 0) {
+        userTable.innerHTML = `<tr><td colspan="8">Inga användare tillgängliga</td></tr>`;
+        return;
+    }
+
+    users.forEach((user) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+        <td>${user.id}</td>
+        <td>${user.firstName}</td>
+        <td>${user.lastName}</td>
+        <td>${user.username}</td> 
+        <td>${user.phone}</td> 
+        <td>${user.email}</td>
+        <td>${user.noOfOrders}</td>
+        <td>${user.role}</td> `
+
+        userTable.appendChild(row);
+    });
+}
+
+function sortUsersByField(field) {
+    if (currentUsers === 0) return;
+
+    const direction = sortDirections[field] === "asc" ? "desc" : "asc";
+    sortDirections[field] = direction;
+
+    currentUsers.sort((a, b) => {
+        const valueA = (a[field] || "").toString();
+        const valueB = (b[field] || "").toString();
+
+        const strA = (valueA || "").toString(); 
+        const strB = (valueB || "").toString(); 
+
+        if (!isNaN(strA) && !isNaN(strB) && strA !== "" && strB !== "") { 
+            return direction === "asc" ? valueA - valueB : valueB - valueA; 
+        } 
+
+        const comparison = strA.localeCompare(strB, "sv");
+        return direction === "asc" ? comparison : -comparison;
+    });
+    createTableAllUsers(currentUsers);
 }
 
 const updateUserBtn = document.getElementById("updateUserBtn");
@@ -285,11 +335,20 @@ updateUserBtn.addEventListener("click", function(event) {
     putUser();
 });
 
+const getUserUpdateBtn = document.getElementById("getUserUpdateBtn");
 
+if (getUserUpdateBtn) {
+    getUserUpdateBtn.addEventListener("click", function(event) {
+        event.preventDefault();
+        getUserAdmin();
+    });
+}
 
 function putUser() {
     const basicAuth = localStorage.getItem("basicAuth");
     const isAdmin = localStorage.getItem("isAdmin") === "true";
+    const customerId = localStorage.getItem("customerId");
+
     const userId = document.getElementById("updateUserId")?.value || "";
     const first_name = document.getElementById("updateFirstName")?.value || "";
     const last_name = document.getElementById("updateLastName")?.value || "";
@@ -300,9 +359,6 @@ function putUser() {
     const updateMsg = document.getElementById("updateMsg");
 
     if (updateMsg) updateMsg.textContent = "";
-
-   
-
 
     if (!userId) {
         if (updateMsg) {
@@ -316,13 +372,10 @@ function putUser() {
         lastName: last_name,
         phone: phone,
         email: email,
-        role: role,
         username: updateUsername,
         password: updatePassword
     };
-    if (isAdmin) {
-        updateData.role = document.getElementById("updateRole")?.value || "";
-    }
+   
     const url = `http://localhost:8080/api/v1/users/${userId}`;
     fetch(url, {
             method: "PUT",
@@ -338,8 +391,7 @@ function putUser() {
         .then((data) => {
             if (updateMsg) {
                 updateMsg.style.color = "green";
-                updateMsg.textContent = "Användaren har uppdaterats i databasen!";
-                document.getElementById("updatePutUserForm").reset();
+                updateMsg.textContent = "Ändringarna har sparats!";
             }
             console.log("Uppdatering lyckades:", data);
         })
@@ -350,21 +402,67 @@ function putUser() {
         });
 }
 
-const updateUser = document.querySelectorAll('a[href="#updateUser"]');
+const updateUser = document.querySelectorAll('a[href="#getUserForUpdate"]');
 updateUser.forEach(function(updateUser) {
     updateUser.addEventListener("click", function(event) {
         event.preventDefault();
         hideAllSections();
-        const targetDiv = document.getElementById("updateUser");
-        if (targetDiv) {
-            targetDiv.classList.remove("hidden");
-        }
+        
         const dropdown = document.getElementById("myDropdown");
         if (dropdown) {
             dropdown.classList.remove("show");
         }
+
+        const userIdInput = document.getElementById("updateUserId");
+        const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+        const isAdmin = localStorage.getItem("isAdmin") === "true";
+        const userId = localStorage.getItem("customerId");
+            console.log("hej2", isAdmin);
+        if (isAdmin) {
+            const updateDiv = document.getElementById("getUserForUpdate");
+            if (updateDiv) {
+                updateDiv.classList.remove("hidden");
+
+            } 
+        } else {
+                console.log("hej");
+                const targetDiv = document.getElementById("updateUser");
+                if (targetDiv) {
+                    targetDiv.classList.remove("hidden");
+                    if(userId) {
+                        userIdInput.disabled = true;
+                        autofillProfile(userId);
+                    }
+            }
+        }
     });
 });
+
+    function autofillProfile(userId) {
+    const basicAuth = localStorage.getItem("basicAuth");
+    const url = `http://localhost:8080/api/v1/users/${userId}`;
+    const updateMsg = document.getElementById("updateMsg");
+    fetch(url, {
+        method: "GET",
+        headers: getHeaders(basicAuth),
+        mode: "cors",
+        credentials: "include"
+    })
+    .then((response) => {
+        if (!response.ok) throw new Error("Fel hämtning");
+        return response.json();
+    })
+    .then((user) => {
+  
+        document.getElementById("updateUserId").value = user.id || "";
+        document.getElementById("updateFirstName").value = user.firstName || "";
+        document.getElementById("updateLastName").value = user.lastName || "";
+        document.getElementById("updatePhone").value = user.phone || "";
+        document.getElementById("updateEmail").value = user.email || "";
+        document.getElementById("updateUsername").value = user.username || "";
+        document.getElementById("updatePassword").value = "";
+    });
+}
 
 
 const deleteUserLink = document.querySelector('a[href="#deleteUser"]');
@@ -390,6 +488,61 @@ if (deleteUserBtn) {
     })
 }
 
+ 
+
+function sortUsers() { 
+
+    const sortUserId = document.getElementById("thGetAllUserId"); 
+    const sortUserFirstName = document.getElementById("thFirstName"); 
+    const sortUserLastName = document.getElementById("thLastName"); 
+    const sortUserUsername = document.getElementById("thUsername"); 
+    const sortPhone = document.getElementById("thPhone"); 
+    const sortEmail = document.getElementById("thEmail"); 
+    const sortNoOfOrders = document.getElementById("thNoOfOrders"); 
+    const sortRole = document.getElementById("thRole"); 
+
+    const sortColumn = [
+        { 
+            id: "thGetAllUserId", 
+            field: "id" 
+        }, 
+        { 
+            id: "thFirstName", 
+            field: "firstName" 
+        }, 
+        { 
+            id: "thLastName", 
+            field: "lastName" 
+        }, 
+        { 
+            id: "thPhone", 
+            field: "phone" 
+        }, 
+        { 
+            id: "thEmail", 
+            field: "email" 
+        }, 
+        { 
+            id: "thNoOfOrders", 
+            field: "noOfOrders" 
+        }, 
+        { 
+        id: "thRole", 
+        field: "role" 
+        } 
+    ]; 
+    sortColumn.forEach(col => 
+        { const column = document.getElementById(col.id); 
+
+        if (column)
+            { column.addEventListener("click", () => 
+                {  sortUsersByField(col.field);
+                }); 
+            } 
+        }); 
+}
+
+   //Lägga in anrop till sök funktion för användare? 
 
 function deleteUser() {
     let id = document.getElementById("deleteUserId").value;
@@ -418,6 +571,7 @@ function deleteUser() {
 }
 
 
+
 //Hämta en specifik användare
 const getUserLink = document.querySelector('a[href="#getUser"]');
 
@@ -439,30 +593,23 @@ const getUserBtn = document.getElementById("getUserBtn");
 if (getUserBtn) {
     getUserBtn.addEventListener("click", function(event) {
         event.preventDefault();
-        getUser();
+        getUserAdmin();
     });
 }
 
-
-function getUser() {
-    const getUserId = document.getElementById("getUserId").value;
-    const getUserMsg = document.getElementById("getUserMsg");
+function getUserAdmin(userId) {
     
-}
-function getOwnUser() {
-    const getUserId = localStorage.getItem("customerId");
-    const getUserMsg = document.getElementById("getOwnUserMsg");
-}
-
-function getUserGlobal(userId, getUserMsg) {
-    const url = `http://localhost:8080/api/v1/users/${getUserId}`;
+    const getUserMsg = document.getElementById("getUserMsg");
     const userData = {
-        id: getUserId
+        id: document.getElementById("getUserUpdateId").value || ""
     }
+    const url = `http://localhost:8080/api/v1/users/${userData.id}`;
+    const basicAuth = localStorage.getItem("basicAuth");
 
     fetch(url, {
             method: "GET",
             mode: "cors",
+            headers: getHeaders(basicAuth),
             credentials: "include"
         })
         .then((response) => {
@@ -470,9 +617,18 @@ function getUserGlobal(userId, getUserMsg) {
             return response.json();
         })
         .then((user) => {
-            getUserMsg.textContent = `Användare: ${user.username} - ${user.firstName} ${user.lastName} - 
-   ${user.email} - ${user.phone} - ${user.role}`;
-            document.getElementById("getUserForm").reset();
+            hideAllSections();
+            document.getElementById("updateUser").classList.remove("hidden");
+           const updateUserId = document.getElementById("updateUserId").value = user.id || "";
+            document.getElementById("updateFirstName").value = user.firstName || "";
+            document.getElementById("updateLastName").value = user.lastName || "";
+            document.getElementById("updatePhone").value = user.phone || "";
+            document.getElementById("updateEmail").value = user.email || "";
+            document.getElementById("updateUsername").value = user.username || "";
+            document.getElementById("updatePassword").value = "";
+            document.getElementById("getUserForUpdateForm").reset();
+            getUserMsg.textContent = "";
+            updateUserId.disabled = true;
         })
         .catch((error) => {
             console.error("Error:", error);
@@ -728,7 +884,7 @@ getAllCarsLink.forEach(function(link) {
     });
 });
 
-function sorteringsgrej() {
+function sortCars() {
     const sortName = document.getElementById("thName");
     const sortType = document.getElementById("thType");
     const sortId = document.getElementById("thId");
@@ -982,9 +1138,11 @@ if (getAllCarsUserLink) {
 
 function getACar(carId, carForm, carMsg) {
     const url = `http://localhost:8080/api/v1/cars/${carId}`;
+    const basicAuth = localStorage.getItem("basicAuth");
 
     fetch(url, {
             method: "GET",
+            headers: getHeaders(basicAuth),
             credentials: "include"
 
         })
@@ -993,7 +1151,7 @@ function getACar(carId, carForm, carMsg) {
             return response.json();
         })
         .then((car) => {
-            carMsg.textContent = `Bilen: ${car.name}, ${car.brand}, ${car.feature1}, ${car.feature2},  
+            carMsg.textContent = `Bilen: ${car.name}, ${car.model}, ${car.feature1}, ${car.feature2},  
             ${car.feature3}, ${car.type}, ${car.price}. ID: ${car.id}`;
             const form = document.getElementById(carForm);
             if (form) form.reset();
@@ -1275,8 +1433,9 @@ function createTableAllBookings(bookings) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    sorteringsgrej();
+    sortCars();
     sortBookings();
+    sortUsers();
 });
 
 function sortBookings() {
@@ -1662,10 +1821,6 @@ function searchBookingUsers() {
 }
 
 //Uppdatera bil
-let headPutCar = new Headers();
-headPutCar.append("Content-Type", "application/json");
-headPutCar.append("Accept", "application/json");
-
 const updateCar1Btn = document.getElementById("updateCar1Btn");
 if (updateCar1Btn) {
     updateCar1Btn.addEventListener("click", function(event) {
@@ -1674,10 +1829,6 @@ if (updateCar1Btn) {
         const updateMsg = document.getElementById("updateCar1Msg");
         const basicAuth = localStorage.getItem("basicAuth");
 
-        if (basicAuth) {
-            headPutCar.set("Authorization", `Basic ${basicAuth}`);
-        }
-
         if (!carId) {
             updateMsg.innerText = "Mata in giltigt id.";
             return;
@@ -1685,7 +1836,8 @@ if (updateCar1Btn) {
         const url = `http://localhost:8080/api/v1/cars/${carId}`;
         fetch(url, {
                 method: "GET",
-                headers: headPutCar
+                headers: getHeaders(basicAuth),
+                credentials: "include"
             })
             .then(response => {
                 if (!response.ok) {
@@ -1788,11 +1940,6 @@ if (updateCarLink) {
     });
 }
 
-
-let headersDelBooking = new Headers();
-headersDelBooking.append("Content-Type", "application/json");
-headersDelBooking.append("Accept", "application/json");
-
 //Radera bokning metod
 function deleteBooking(id) {
     if (!id) {
@@ -1808,7 +1955,7 @@ function deleteBooking(id) {
     fetch(url, {
             method: "DELETE",
             mode: "cors",
-            headers: headersDelBooking,
+            headers: getHeaders(basicAuth),
             credentials: "include"
         })
         .then((response) => {
@@ -1831,7 +1978,50 @@ function deleteBooking(id) {
             deleteBookingMsg.style.color = "red";
         });
 }
+const returnBtn = document.getElementById("returnBtn");
+if(returnBtn) {
+    returnBtn.addEventListener("click", function(event) {
+        event.preventDefault();
+        returnCar();
+    })
+}
 
+function returnCar() {
+    const basicAuth = localStorage.getItem("basicAuth");
+    const id = document.getElementById("returnId").value.trim();
+    const returnMsg = document.getElementById("returnMsg");
+    const url = `http://localhost:8080/api/v1/bookings/return/${id}`;
+    fetch(url, {
+        method: "PUT",
+        mode: "cors",
+        credentials: "include",
+        headers: getHeaders(basicAuth)
+    })
+    .then((response) => {
+        if(!response.ok) { throw new Error("Problem med att returnera bil"); }
+        if(response.ok) {
+            returnMsg.textContent = "Returen gick bra!";
+            returnMsg.style.color = "green";
+        }
+    })
+    .catch((error) => {
+        console.error("Fel: ", error);
+        returnMsg.textContent = "Gick inte att returnera";
+    });
+                    }
+
+const returnCarDiv = document.querySelector(`a[href="#returnCarDiv"]`);
+    if (returnCarDiv) {
+    returnCarDiv.addEventListener("click", (event) => {
+        event.preventDefault();
+        hideAllSections();
+        const targetDiv = document.getElementById("returnCarDiv");
+        if (targetDiv) {
+            targetDiv.classList.remove("hidden");
+        }
+        document.getElementById("CarAdminDivDrop").classList.remove("show");
+    });
+}
 
 
 document.addEventListener("DOMContentLoaded", () => {
