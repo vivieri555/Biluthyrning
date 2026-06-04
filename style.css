@@ -4,6 +4,8 @@ body {
     justify-content: center;
     text-align: center;
     padding-top: 80px;
+    background-color: rgb(235, 206, 227);
+    margin-left: 5%; 
 }
 #main
     {
@@ -332,12 +334,6 @@ max-height: 50px;
     #updateCarBtn {
         background-color: rgb(152, 207, 180);
     }
-    #carList {
-        list-style-type: none;
-    }
-    #userList {
-        list-style-type: none;
-    }
 
     #carAdminBtn { 
   background-color: lightgray; 
@@ -453,12 +449,6 @@ background-color: #ddd;
 #dropdownBookingBtn:hover, #dropdownBookingBtn:focus {
     background-color: rgb(180, 180, 180); 
 }
-#carUserList {
-    list-style-type: none;
-}
-#carAdminList {
-    list-style-type: none;
-}
 .table-car-img {
     width: 60px; 
     height: 40px;
@@ -482,6 +472,18 @@ background-color: #ddd;
 }
 #getAllCarsList {
     margin: 100px;
+}
+.getCarImage {
+    width: 30%;
+    height: auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+.getACarList {
+    list-style-type: none;
+    background-color: rgb(207, 194, 203);
+    width: 30%;
+    text-align: center;
+    padding: 5px;
 }
 .standardBtn {
     border: solid 1px rgb(23, 23, 63);

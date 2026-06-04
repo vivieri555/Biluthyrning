@@ -1152,6 +1152,7 @@ function getACar(carId, carForm, carMsg, carList) {
             carMsg.textContent = "";
 
             const ul = document.createElement("ul");
+            ul.classList.add("getACarList");
             const carData = [
                 `Id: ${car.id}`,
                 `Namn: ${car.name}`,
@@ -1175,6 +1176,7 @@ function getACar(carId, carForm, carMsg, carList) {
                 const img = document.createElement("img");
                 img.src = `data:image/jpeg;base64,${car.image}`;
                 img.alt = `Bild på ${car.name}`;
+                img.classList.add("getCarImage");
                  carList.appendChild(img);
             }
 
