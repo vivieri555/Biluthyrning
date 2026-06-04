@@ -36,7 +36,7 @@
                     <div id="CarAdminDivDrop" class="dropdown-content">
                         <a href=".getAllCars">Se alla Bilar</a>
                         <a href="#createCarDiv">Skapa ny bil</a>
-                        <a href="#getACar">Hämta specifik bil</a>
+                        <a href="#getACar">Sök specifik bil</a>
                         <a href="#updateCarDiv">Ändra på en befintlig bil</a>
                         <a href="#deleteCar">Radera bil</a>
                         <a href="#returnCarDiv">Returnera bil</a>
@@ -68,9 +68,8 @@
         <ul class="userNavClass">
             <li><a href="#getAllCars" id="getAllCarsUserLink">Se och boka bilar</a></li>
             <li><a href="#getUserForUpdate">Användarprofil</a></li>
-            <li><a href="#getACarUser" id="getACarUserLink">Hämta en specifik bil</a></li>
+            <li><a href="#getACarUser" id="getACarUserLink">Sök specifik bil</a></li>
             <li><a href="#myBookings" id="myBookingsLink">Se dina bokningar</a></li>
-            <li><a href="">Hämta en enskild bokning med id?</a></li>
             <li><a href="#" class="logoutLink">Logga ut</a></li>
         </ul>
     </div>
@@ -380,8 +379,6 @@
             </form>
         </div>
         <h1>Se alla bokningar</h1>
-      
-  
     <p id="getAllBookingsMsg"></p>
     <div class="bookingTable">
         <table>
@@ -423,6 +420,7 @@
             <button id="getACarBtn" class="standardBtn">Hämta</button>
             <p id="getACarMsg"></p>
         </form>
+        <ul id="carAdminList"></ul>
     </div>
     <div id="getACarUser" class="hidden">
 <h2>Hämta specifik bil</h2>
@@ -432,6 +430,8 @@
             <button id="getACarBtn2" class="standardBtn">Hämta</button>
             <p id="getACarMsg2"></p>
 </form>
+    <ul id="carUserList">
+    </ul>
     </div> 
 <div id="bookBtn" class="hidden">
     <button class="bookingBtn">Gå till bokning</button>
@@ -462,7 +462,6 @@
             </form>
         </div>
         <h3>Här kan du se alla dina bokningar</h3>
-        <ul id="myBookingsList"></ul>
         <p id="myBookingsMsg"></p>
         <p id="deleteBookingMsg"></p>
         <div class="myBookingsTable">

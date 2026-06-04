@@ -220,8 +220,8 @@ if (getAllUsersLink) {
             targetDiv.classList.remove("hidden");
         }
         document.getElementById("myDropdown").classList.remove("show");
+        getAllUsers();
     });
-    getAllUsers();
 }
 
 //Funktion för dropdownmenyn i adminpanelen
@@ -266,6 +266,7 @@ function getAllUsers() {
         .then((users) => {
             currentUsers = users;
             createTableAllUsers(users);
+            sortUsers();
             })
         .catch((error) => {
             console.error("Error:", error);
@@ -768,6 +769,7 @@ function getCars() {
 
             currentCars = cars;
             createTableCars(cars);
+            sortCars();
         })
         .catch((error) => {
             console.error("Error:", error);
@@ -887,8 +889,17 @@ getAllCarsLink.forEach(function(link) {
 });
 
 function sortCars() {
+            console.log("name");
+    
     const sortName = document.getElementById("thName");
     const sortType = document.getElementById("thType");
+    const sortCarsId = document.getElementById("thId"); 
+    const sortModel = document.getElementById("thModel"); 
+    const sortFeature1 = document.getElementById("thFeature1"); 
+    const sortFeature2 = document.getElementById("thFeature2"); 
+    const sortFeature3 = document.getElementById("thFeature3"); 
+    const sortPrice = document.getElementById("thPrice"); 
+    const sortBooked = document.getElementById("thBooked"); 
     
     const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
     const isAdmin = localStorage.getItem("isAdmin") === "true";
@@ -903,10 +914,11 @@ function sortCars() {
             { id: "thFeature2", field: "feature2" },
             { id: "thFeature3", field: "feature3" },
             { id: "thPrice", field: "price" },
-            { id: "thBooked", field: "booked" }
+            { id: "thBooked", field: "booked" },
         ];
         sortColumn.forEach(col => {
             const column = document.getElementById(col.id);
+            console.log(column);
             if (column) {
                 column.addEventListener("click", () => {
                     sortCarsByField(col.field);
@@ -915,13 +927,17 @@ function sortCars() {
         });
     } else if (isLoggedIn) {
     sortName.addEventListener("click", () => {
+            console.log("name");
+
             sortCarsByField("name");
         });
         sortType.addEventListener("click", () => {
             sortCarsByField("type");
         });
     }
+    //Behöver man lägga in någon mer sök funktion här?
 }
+
 
 function sortCarsByField(field) {
     if (currentCars.length === 0) return;
@@ -933,12 +949,18 @@ function sortCarsByField(field) {
         const valueA = (a[field] || "").toString();
         const valueB = (b[field] || "").toString();
 
-        if (typeof valueA === "number" && typeof valueB === "number") {
-            return direction === "asc" ? valueA - valueB : valueB - valueA;
-        }
+        if (typeof valueA === "boolean" && typeof valueB === "boolean") { 
+            return direction === "asc" ? (valueA === valueB ? 0 : valueA ? -1 : 1) : (valueA === valueB ? 0 : valueA ? 1 : -1); 
+        } 
 
-        const comparison = valueA.localeCompare(valueB, "sv");
+        const strA = (valueA || "").toString(); 
+        const strB = (valueB || "").toString(); 
 
+        if (!isNaN(strA) && !isNaN(strB) && strA !== "" && strB !== "") { 
+            return direction === "asc" ? valueA - valueB : valueB - valueA; 
+        } 
+
+        const comparison = strA.localeCompare(strB, "sv");
         return direction === "asc" ? comparison : -comparison;
     });
 
@@ -1112,7 +1134,7 @@ if (getAllCarsUserLink) {
     });
 }
 
-function getACar(carId, carForm, carMsg) {
+function getACar(carId, carForm, carMsg, carList) {
     const url = `http://localhost:8080/api/v1/cars/${carId}`;
     const basicAuth = localStorage.getItem("basicAuth");
 
@@ -1127,8 +1149,35 @@ function getACar(carId, carForm, carMsg) {
             return response.json();
         })
         .then((car) => {
-            carMsg.textContent = `Bilen: ${car.name}, ${car.model}, ${car.feature1}, ${car.feature2},  
-            ${car.feature3}, ${car.type}, ${car.price}. ID: ${car.id}`;
+            carMsg.textContent = "";
+
+            const ul = document.createElement("ul");
+            const carData = [
+                `Id: ${car.id}`,
+                `Namn: ${car.name}`,
+                `Modell: ${car.model}`,
+                `Feature: ${car.feature1}`,
+                `Feature 2: ${car.feature2}`,
+                `Feature 3: ${car.feature3}`,
+                `Typ: ${car.type}`,
+                `Pris: ${car.price}`,
+                `Bokad: ${car.booked ? "Ja" : "Nej"}`
+            ]
+
+            carData.forEach(detail => {
+                const li = document.createElement("li");
+                li.textContent = detail;
+                ul.appendChild(li);
+            });
+            carList.appendChild(ul);
+
+            if (car.image) {
+                const img = document.createElement("img");
+                img.src = `data:image/jpeg;base64,${car.image}`;
+                img.alt = `Bild på ${car.name}`;
+                 carList.appendChild(img);
+            }
+
             const form = document.getElementById(carForm);
             if (form) form.reset();
         })
@@ -1147,8 +1196,9 @@ if (getACarFormUser) {
 
         const getACarMsg2 = document.getElementById("getACarMsg2");
         getACarMsg2.textContent = "";
+        const carList = document.getElementById("carUserList");
         const id = document.getElementById("getACarId2").value;
-        getACar(id, "getACarFormUser", getACarMsg2);
+        getACar(id, "getACarFormUser", getACarMsg2, carList);
     });
 }
 //hämta bil admin meny
@@ -1159,8 +1209,9 @@ if (getACarForm) {
 
         const getACarMsg = document.getElementById("getACarMsg");
         getACarMsg.textContent = "";
+        const carList = document.getElementById("carAdminList");
         const id = document.getElementById("getACarId").value;
-        getACar(id, "getACarForm", getACarMsg);
+        getACar(id, "getACarForm", getACarMsg, carList);
     });
 }
 //Funktion för bil dropdownmenyn i adminpanelen 
@@ -1337,6 +1388,7 @@ function getAllBookings() {
         .then((bookings) => {
             currentBookings = bookings;
             createTableAllBookings(bookings);
+            sortBookings();
         })
         .catch((error) => {
             console.error("Fel: ", error);
@@ -1409,9 +1461,6 @@ function createTableAllBookings(bookings) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    sortCars();
-    sortBookings();
-    sortUsers();
     closeCommercial("closeBtn1", "c1");
     closeCommercial("closeBtn2", "commercialBoxCandyz");
 });
@@ -1672,16 +1721,12 @@ function myBookings() {
     const id = localStorage.getItem("customerId");
     const basicAuth = localStorage.getItem("basicAuth");
     const url = `http://localhost:8080/api/v1/bookings/me`;
-    let headersMyBooking = new Headers();
-    headersMyBooking.append("Content-Type", "application/json");
-    headersMyBooking.append("Accept", "application/json");
-    headersMyBooking.append("Authorization", `Basic ${basicAuth}`);
 
     fetch(url, {
             method: "GET",
             mode: "cors",
             credentials: "include",
-            headers: headersMyBooking
+            headers: getHeaders(basicAuth)
         })
         .then((response) => {
             if (response.status === 404) {
