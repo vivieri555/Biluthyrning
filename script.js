@@ -171,10 +171,9 @@ function postLogIn() {
             loggInAttempts = 0;
             logEvent("Användaren har loggat in.");
 
-            localStorage.setItem("isLoggedIn", "true");
             localStorage.setItem("customerId", data.userId);
-            localStorage.setItem("isAdmin", data.isAdmin);
             localStorage.setItem("basicAuth", basicAuthString);
+            localStorage.setItem("isAdmin", data.isAdmin);
 
             const loggInForm = document.getElementById("loggInForm");
             loggInForm.style.display = "none";
@@ -182,11 +181,13 @@ function postLogIn() {
             const isAdmin = data.isAdmin;
             if (isAdmin === true) {
                 console.log(data); //Kolla vad som kommer
-                localStorage.setItem("isAdmin", "true");
+                localStorage.setItem("isAdmin", data.isAdmin);
+                localStorage.setItem("isLoggedIn", "true");
                 document.getElementById("adminNav").classList.remove("hidden");
                 document.getElementById("header1").classList.add("hidden");
                 document.getElementById("userHeader").classList.add("hidden");
             } else {
+                localStorage.setItem("isLoggedIn", "true");
                 localStorage.setItem("isAdmin", "false");
                 document.getElementById("header1").classList.add("hidden");
                 document.getElementById("adminNav").classList.add("hidden");
@@ -220,6 +221,7 @@ if (getAllUsersLink) {
         }
         document.getElementById("myDropdown").classList.remove("show");
     });
+    getAllUsers();
 }
 
 //Funktion för dropdownmenyn i adminpanelen
@@ -244,14 +246,6 @@ window.onclick = function(event) {
             }
         }
     }
-}
-
-//Anrop till hämtning av användare
-const getAllUsersBtn = document.getElementById("getAllUsersBtn");
-if (getAllUsersBtn) {
-    getAllUsersBtn.addEventListener("click", function() {
-        getAllUsers();
-    });
 }
 
 //Hämta alla användare
@@ -784,6 +778,12 @@ function getCars() {
         });
 }
 
+function sortIcons(field, direction) {
+    const isAdmin = localStorage.getItem("isAdmin") === "true";
+    const columns = document.querySelectorAll("#main th[]");
+
+}
+
 function createTableCars(cars) {
 
     console.log("bilddata: ", cars[0]);
@@ -823,7 +823,7 @@ function createTableCars(cars) {
 
         if (!isLoggedIn) {
             actionCell.innerHTML = `<span class="login">Logga in för att boka</span>`;
-        } else if (isAdmin === true) {
+        } else if (isAdmin) {
             const deleteBtn = document.createElement("button");
             deleteBtn.textContent = "Ta bort";
             deleteBtn.className = "btn-delete";
@@ -889,54 +889,21 @@ getAllCarsLink.forEach(function(link) {
 function sortCars() {
     const sortName = document.getElementById("thName");
     const sortType = document.getElementById("thType");
-    const sortId = document.getElementById("thId");
-    const sortModel = document.getElementById("thModel");
-    const sortFeature1 = document.getElementById("thFeature1");
-    const sortFeature2 = document.getElementById("thFeature2");
-    const sortFeature3 = document.getElementById("thFeature3");
-    const sortPrice = document.getElementById("thPrice");
-    const sortBooked = document.getElementById("thBooked");
-
-    if (sortName) {
-        sortName.addEventListener("click", () => {
-            sortCarsByField("name");
-        });
-    }
-    if (sortType) {
-        sortType.addEventListener("click", () => {
-            sortCarsByField("type");
-        });
-    }
+    
+    const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
     const isAdmin = localStorage.getItem("isAdmin") === "true";
-    if (isAdmin === true) {
-        const sortColumn = [{
-                id: "thId",
-                field: "id"
-            },
-            {
-                id: "thModel",
-                field: "model"
-            },
-            {
-                id: "thFeature1",
-                field: "feature1"
-            },
-            {
-                id: "thFeature2",
-                field: "feature2"
-            },
-            {
-                id: "thFeature3",
-                field: "feature3"
-            },
-            {
-                id: "thPrice",
-                field: "price"
-            },
-            {
-                id: "thBooked",
-                field: "booked"
-            }
+   
+    if (isAdmin) {
+        const sortColumn = [
+            { id: "thId", field: "id" },
+            { id: "thName", field: "name" },
+            { id: "thType", field: "type" },
+            { id: "thModel", field: "model" },
+            { id: "thFeature1", field: "feature1" },
+            { id: "thFeature2", field: "feature2" },
+            { id: "thFeature3", field: "feature3" },
+            { id: "thPrice", field: "price" },
+            { id: "thBooked", field: "booked" }
         ];
         sortColumn.forEach(col => {
             const column = document.getElementById(col.id);
@@ -945,6 +912,13 @@ function sortCars() {
                     sortCarsByField(col.field);
                 });
             }
+        });
+    } else if (isLoggedIn) {
+    sortName.addEventListener("click", () => {
+            sortCarsByField("name");
+        });
+        sortType.addEventListener("click", () => {
+            sortCarsByField("type");
         });
     }
 }
@@ -1438,6 +1412,8 @@ document.addEventListener("DOMContentLoaded", () => {
     sortCars();
     sortBookings();
     sortUsers();
+    closeCommercial("closeBtn1", "c1");
+    closeCommercial("closeBtn2", "commercialBoxCandyz");
 });
 
 function sortBookings() {
@@ -2025,6 +2001,14 @@ const returnCarDiv = document.querySelector(`a[href="#returnCarDiv"]`);
     });
 }
 
+function closeCommercial(btn, box) {
+    const closeBtn = document.getElementById(btn);
+    const commercialBox = document.getElementById(box);
+
+    closeBtn.addEventListener("click", () => {
+        commercialBox.style.display = "none";
+    });
+}
 
 document.addEventListener("DOMContentLoaded", () => {
     const logoutLink = document.querySelectorAll(".logoutLink");
@@ -2035,6 +2019,7 @@ document.addEventListener("DOMContentLoaded", () => {
             localStorage.removeItem("isLoggedIn");
             localStorage.removeItem("isAdmin");
             localStorage.removeItem("basicAuth");
+            localStorage.clear();
             window.location.reload();
         });
     });

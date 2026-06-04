@@ -158,6 +158,66 @@ max-height: 50px;
     .commercial img {
         width: 160px;
     }
+    #rightFoot {
+        padding: 15px;
+        height: 100px;
+        animation: commercialAnimation 2s infinite ease-in-out;
+        font-size: 1.75rem;
+        color: blue;
+    }
+
+    @keyframes commercialAnimation {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+    .commercialBox {
+    padding: 20px;
+    background-color: #f1f1f1;
+    border-top: 6px solid #2196F3;
+    margin-bottom: 15px;
+    position: relative;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    }
+    #commercialBoxCandyz {
+    padding: 20px;
+    background-color: #f1f1f1;
+    border-top: 6px solid #2196F3;
+    margin-bottom: 15px;
+    position: relative;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    }
+    
+    .close-btn {
+  position: absolute;
+  top: 5px;
+  right: 15px;
+  color: #555;
+  font-size: 22px;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 10;
+}
+#candyzMsg {
+    color: rgb(237, 104, 126);
+    font-size: 1.75rem;
+}
+#candyzAni {
+    color: rgb(237, 104, 126);
+    font-size: 1.75rem;
+    position: relative;
+    animation: move 5s infinite;
+}
+@keyframes move {
+    from { left: 0px;}
+    to {left: 200px;}
+}
    
     #loggInDiv {
         display: flex;
