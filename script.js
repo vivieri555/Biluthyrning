@@ -63,7 +63,7 @@ document.getElementById("createAccountForm").addEventListener("submit", function
     };
     sendUserToApi(newUser, "createAccountForm", createMsg);
 });
-function sendUserToApi(newUser, formId, messageElement) {
+function sendUserToApi(newUser, formId, message) {
     const url = "http://localhost:8080/api/v1/users";
     fetch(url, {
             method: "POST",
@@ -90,12 +90,12 @@ function sendUserToApi(newUser, formId, messageElement) {
                 alert("Konto sparat!");
                 document.getElementById(formId).reset();
             } else {
-                messageElement.textContent = result.data.message || "Misslyckades att spara konto.";
+                message.textContent = result.data.message || "Misslyckades att spara konto.";
             }
         })
         .catch(function(error) {
             console.error("Error:", error);
-            messageElement.textContent = "Ett fel inträffade. Försök igen senare.";
+            message.textContent = "Ett fel inträffade. Försök igen senare.";
         });
 }
 const createAccount2Link = document.querySelector('a[href="#createAccount2"]');
@@ -163,28 +163,11 @@ function postLogIn() {
             localStorage.setItem("customerId", data.userId);
             localStorage.setItem("basicAuth", basicAuthString);
             localStorage.setItem("isAdmin", data.isAdmin);
-            const start = document.getElementById("startLogins");
+            localStorage.setItem("isLoggedIn", "true");
             const loggInForm = document.getElementById("loggInForm");
             loggInForm.style.display = "none";
             navContainer.style.display = "none";
-            const isAdmin = data.isAdmin;
-                if (isAdmin === true) {
-            console.log(data); //Kolla vad som kommer
-                localStorage.setItem("isAdmin", data.isAdmin);
-                localStorage.setItem("isLoggedIn", "true");
-                document.getElementById("adminNav").classList.remove("hidden");
-                document.getElementById("header1").classList.add("hidden");
-                document.getElementById("userHeader").classList.add("hidden");
-                document.querySelector("#startLogins").classList.remove("hidden");
-                start.innerHTML = `Välkommen admin! <img src="KoncernensLogga.png" alt="bild på loggan">`;
-                } else {
-                localStorage.setItem("isLoggedIn", "true");
-                localStorage.setItem("isAdmin", "false");
-                document.getElementById("header1").classList.add("hidden");
-                document.getElementById("adminNav").classList.add("hidden");
-                document.getElementById("userHeader").classList.remove("hidden");
-                document.querySelector("#startLogins").classList.remove("hidden");
-                }
+            showLoggedInMenu();
         })
         .catch((error) => {
             loggInAttempts++;
@@ -234,6 +217,29 @@ window.onclick = function(event) {
         }
     }
 }
+function showLoggedInMenu() {
+    const start = document.getElementById("startLogins");
+    const isAdmin = localStorage.getItem("isAdmin") === "true";
+    const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+
+    if (!isLoggedIn)
+        return;
+
+    start.classList.remove("hidden");
+    document.getElementById("startPage").classList.add("hidden");
+
+    if (isAdmin === true) {
+        document.getElementById("adminNav").classList.remove("hidden");
+        document.getElementById("header1").classList.add("hidden");
+        document.getElementById("userHeader").classList.add("hidden");
+        start.innerHTML = `Välkommen admin! <img src="KoncernensLogga.png" alt="bild på loggan">`;
+    } else {
+        document.getElementById("header1").classList.add("hidden");
+        document.getElementById("adminNav").classList.add("hidden");
+        document.getElementById("userHeader").classList.remove("hidden");
+    }
+}
+
 //Hämta alla användare
 function getAllUsers() {
     const url = "http://localhost:8080/api/v1/users";
@@ -445,7 +451,10 @@ const deleteUserBtn = document.getElementById("deleteUserBtn");
     if (deleteUserBtn) {
     deleteUserBtn.addEventListener("click", function(event) {
         event.preventDefault();
-        deleteUser();
+         let id = document.getElementById("deleteUserId").value;
+        if (confirm(`Vill du verkligen radera användaren med id " + ${id} ?`)) {
+    deleteUser();
+        }
     })
 }
 
@@ -775,6 +784,7 @@ const getAllCarsLink = document.querySelectorAll('a[href=".getAllCars"]');
         const targetDiv = document.querySelector(".getAllCars");
             if (targetDiv) {
             targetDiv.classList.remove("hidden");
+            document.getElementById("startPage").classList.add("hidden");
             }
         const dropdown = document.getElementById("myDropdown");
             if (dropdown) {
@@ -1219,12 +1229,12 @@ function createTableAllBookings(bookings) {
         actionsBook.appendChild(deleteBookingBtn);
         bookingTable.appendChild(row);
     });
-
 }
 
 document.addEventListener("DOMContentLoaded", () => {
     closeCommercial("closeBtn1", "c1");
     closeCommercial("closeBtn2", "commercialBoxCandyz");
+    showLoggedInMenu();
 });
 
 function sortBookings() {
@@ -1259,15 +1269,14 @@ function sortBookings() {
     }
     const searchUsersBookingBtn = document.getElementById("searchUsersBookingBtn");
     if (searchUsersBookingBtn) {
-        searchUsersBookingBtn.addEventListener("click", () => {
-            searchUsersBooking();
-        });
+        searchUsersBookingBtn.addEventListener("click", searchUsersBooking);
     }
 }
 
 function searchBooking() {
     const searchBookingForm = document.getElementById("searchBookingForm");
     const getBookingId = document.getElementById("getBookingId");
+    const searchUsersBooking = document.getElementById("searchUsersBooking");
     const searchBookingMsg = document.getElementById("searchBookingMsg");
     const clearSearchBtn = document.getElementById("clearSearchBtn");
         if (searchBookingForm) {
@@ -1292,13 +1301,15 @@ function searchBooking() {
     if (clearSearchBtn) {
         clearSearchBtn.addEventListener("click", () => {
             if (getBookingId) getBookingId.value = "";
+            if (searchUsersBooking) searchUsersBooking.value = "";
             if (searchBookingMsg) searchBookingMsg.textContent = "";
             createTableAllBookings(currentBookings);
         });
     }
 }
 //sök användares alla bokningar
-function searchUsersBooking() {
+function searchUsersBooking(event) {
+    event.preventDefault();
     const basicAuth = localStorage.getItem("basicAuth");
     const searchMsg = document.getElementById("searchUsersBookingMsg");
     const userId = document.getElementById("searchUsersBooking").value.trim();
@@ -1325,6 +1336,7 @@ function searchUsersBooking() {
         .then((bookings) => {
             if (searchMsg) searchMsg.textContent = "";
             createTableAllBookings(bookings);
+            document.getElementById("searchUsersBooking").textContent = "";
         })
         .catch((error) => {
             console.error("Fel vid hämtning av bokningar", error);
