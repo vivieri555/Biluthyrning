@@ -486,18 +486,65 @@ background-color: #ddd;
 #getAllCarsList {
     margin: 100px;
 }
+/*    Hämta en bil admin/user   */
 .getCarImage {
-    width: 30%;
+    flex: 1;
+    width: 40%;
     height: auto;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    min-height: 250px;
+    object-fit: cover;
+    object-position: center;
 }
 .getACarList {
     list-style-type: none;
-    background-color: rgb(207, 194, 203);
-    width: 30%;
+    width: 40%;
+    max-width: 400px;
     text-align: center;
-    padding: 5px;
+    padding: 15px;
+    gap: 15px;
+    flex: 1;
 }
+.getACarList li {
+    text-align: left;
+    white-space: nowrap;
+}
+.carList { 
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 25px;
+    width: 90%;             
+    margin-top: 15px;
+    align-items: stretch;
+    margin: 20px auto 0 auto;
+}
+#getACarUser {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+/*    Hämta en bil admin   */
+#getACar {
+     display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    margin-top: 50px;
+}
+#carAdminList {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 25px;
+    width: 90%;             
+    margin-top: 15px;
+    align-items: stretch;
+    margin: 20px auto 0 auto;
+}
+/*    Knappar    */
 .standardBtn {
     border: solid 1px rgb(23, 23, 63);
     border-radius: 5px;
