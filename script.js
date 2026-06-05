@@ -26,7 +26,9 @@ let sortDirections = {
 function hideAllSections() {
     const sections = ["loggInDiv", "createAccount", "createAccount2", "getAllUsers", "updatePutUser", "updateUser", "getUserForUpdate",
         "deleteUser", "getUser", "getAllCarsList", "getACar", "deleteCar", "returnCarDiv",
-        "createCarDiv", "createBookingDiv", "bookBtn", "myBookings", "getACarUser", "updateCarDiv", "updateCar", "getBookings", "updateBooking"
+        "createCarDiv", "createBookingDiv", "bookBtn", 
+        "myBookings", "getACarUser", "updateCarDiv", "updateCar", "getBookings", "updateBooking"
+        , "startLogins"
     ];
     sections.forEach(id => {
         const element = document.getElementById(id);
@@ -174,6 +176,7 @@ function postLogIn() {
             localStorage.setItem("customerId", data.userId);
             localStorage.setItem("basicAuth", basicAuthString);
             localStorage.setItem("isAdmin", data.isAdmin);
+            const start = document.getElementById("startLogins");
 
             const loggInForm = document.getElementById("loggInForm");
             loggInForm.style.display = "none";
@@ -186,12 +189,15 @@ function postLogIn() {
                 document.getElementById("adminNav").classList.remove("hidden");
                 document.getElementById("header1").classList.add("hidden");
                 document.getElementById("userHeader").classList.add("hidden");
+                document.querySelector("#startLogins").classList.remove("hidden");
+                start.innerHTML = `Välkommen admin! <img src="KoncernensLogga.png" alt="bild på loggan">`;
             } else {
                 localStorage.setItem("isLoggedIn", "true");
                 localStorage.setItem("isAdmin", "false");
                 document.getElementById("header1").classList.add("hidden");
                 document.getElementById("adminNav").classList.add("hidden");
                 document.getElementById("userHeader").classList.remove("hidden");
+                document.querySelector("#startLogins").classList.remove("hidden");
             }
         })
 

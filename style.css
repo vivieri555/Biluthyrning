@@ -4,7 +4,7 @@ body {
     justify-content: center;
     text-align: center;
     padding-top: 80px;
-    background-color: rgb(235, 206, 227);
+    background-color: rgb(246, 239, 244);
     margin-left: 5%; 
 }
 #main
@@ -39,9 +39,8 @@ display: flex;
 justify-content: flex-start;
 }
 .logoHeaderContainer img {
-height: auto;
-width: 100px;
-max-height: 50px;
+width: 15%;
+height: 15%;
 }
 .logoLogIn {
     flex: 1;
@@ -143,9 +142,8 @@ display: flex;
 justify-content: flex-start;
 }
 .logoUserContainer img {
-height: auto;
-width: 100px;
-max-height: 50px;
+height: 20%;
+width: 20%;
 }
 
 #loggInDiv {
@@ -159,6 +157,21 @@ max-height: 50px;
 }
 .box {
     flex:1;
+}
+
+#startPageImg img {
+    max-width: 500px;
+    height: auto;
+}
+#startLogins {
+    padding: 30px;
+    margin-top: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+      img {
+        max-width: 20%;
+    }
 }
 
 /*   Reklam      */
@@ -412,17 +425,17 @@ max-height: 50px;
 .dropdown-content { 
   display: none; 
   position: absolute; 
-  background-color: rgb(71, 71, 134); 
+  background-color: rgb(180, 180, 180); 
   min-width: 160px; 
   overflow: auto; 
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); 
   z-index: 1005; 
   top: 100%;
-  left: 0;
+  left: 50%;
+  transform: translateX(-50%);
 } 
 
 .dropdown-content a { 
-  color: white; 
   padding: 12px 16px; 
   text-decoration: none; 
   display: block; 
@@ -514,7 +527,6 @@ background-color: #ddd;
     background-color:rgb(160, 25, 16);
     color: white;
 }
-
 
 #thName {
     cursor: pointer;
