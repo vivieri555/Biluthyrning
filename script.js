@@ -317,7 +317,48 @@ const getUserUpdateBtn = document.getElementById("getUserUpdateBtn");
     if (getUserUpdateBtn) {
     getUserUpdateBtn.addEventListener("click", function(event) {
         event.preventDefault();
-        getUserAdmin();
+        const userId = document.getElementById("getUserUpdateId").value || "";
+        const msg = document.getElementById("getUserUpdateMsg");
+
+        if(!userId) { msg.textContent = "Vänligen ange id."; return; }
+        autofillProfile(userId, "getUserForUpdateForm", msg);
+    });
+}
+
+function autofillProfileForAdmin(userId, msg) {
+    const basicAuth = localStorage.getItem("basicAuth");
+    const url = `http://localhost:8080/api/v1/users/${userId}`;
+    fetch(url, {
+        method: "GET",
+        headers: getHeaders(basicAuth),
+        mode: "cors",
+        credentials: "include"
+    })
+    .then((response) => {
+        if (!response.ok) throw new Error("Kunde inte hitta användaren.");
+        return response.json();
+    })
+    .then((user) => {
+        hideAllSections();
+        document.getElementById("updateUser").classList.remove("hidden");
+        document.getElementById("updateUserId").value = user.id || "";
+        document.getElementById("updateFirstName").value = user.firstName || "";
+        document.getElementById("updateLastName").value = user.lastName || "";
+        document.getElementById("updatePhone").value = user.phone || "";
+        document.getElementById("updateEmail").value = user.email || "";
+        document.getElementById("updateUsername").value = user.username || "";
+        document.getElementById("updatePassword").value = "";
+        
+        document.getElementById("updateUserId").disabled = true;
+        
+        const searchForm = document.getElementById("getUserForUpdateForm");
+        if (searchForm) searchForm.reset();
+        if (msg) msg.textContent = "";
+    })
+    .catch((error) => {
+        console.error("Error:", error);
+            msg.textContent = "Kunde inte hämta användare. Kontrollera ID.";
+            msg.style.color = "red";
     });
 }
 
@@ -333,12 +374,10 @@ function putUser() {
     const updatePassword = document.getElementById("updatePassword")?.value || "";
     const updateUsername = document.getElementById("updateUsername")?.value || "";
     const updateMsg = document.getElementById("updateMsg");
-        if (updateMsg) updateMsg.textContent = "";
+        updateMsg.textContent = "";
             if (!userId) {
-                if (updateMsg) {
             updateMsg.textContent = "Ange ett giltigt användar-ID.";
             updateMsg.style.color = "red";
-        }
         return;
     }
     let updateData = {
@@ -380,6 +419,8 @@ updateUser.forEach(function(updateUser) {
     updateUser.addEventListener("click", function(event) {
         event.preventDefault();
         hideAllSections();  
+        const updateMsg = document.getElementById("updateMsg");
+        updateMsg.textContent = "";
         const dropdown = document.getElementById("myDropdown");
             if (dropdown) {
             dropdown.classList.remove("show");
@@ -388,7 +429,6 @@ updateUser.forEach(function(updateUser) {
         const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
         const isAdmin = localStorage.getItem("isAdmin") === "true";
         const userId = localStorage.getItem("customerId");
-            console.log("hej2", isAdmin);
         if (isAdmin) {
             const updateDiv = document.getElementById("getUserForUpdate");
             if (updateDiv) {
@@ -408,10 +448,11 @@ updateUser.forEach(function(updateUser) {
     });
 });
 
-    function autofillProfile(userId) {
+    function autofillProfile(userId, form, msg) {
     const basicAuth = localStorage.getItem("basicAuth");
     const url = `http://localhost:8080/api/v1/users/${userId}`;
     const updateMsg = document.getElementById("updateMsg");
+    updateMsg.textContent = "";
         fetch(url, {
         method: "GET",
         headers: getHeaders(basicAuth),
@@ -419,10 +460,12 @@ updateUser.forEach(function(updateUser) {
         credentials: "include"
     })
     .then((response) => {
-        if (!response.ok) throw new Error("Fel hämtning");
+        if (!response.ok) throw new Error("Fel vid hämtning.");
         return response.json();
     })
     .then((user) => {
+        hideAllSections();
+            document.getElementById("updateUser").classList.remove("hidden");
         document.getElementById("updateUserId").value = user.id || "";
         document.getElementById("updateFirstName").value = user.firstName || "";
         document.getElementById("updateLastName").value = user.lastName || "";
@@ -430,6 +473,17 @@ updateUser.forEach(function(updateUser) {
         document.getElementById("updateEmail").value = user.email || "";
         document.getElementById("updateUsername").value = user.username || "";
         document.getElementById("updatePassword").value = "";
+            document.getElementById("updateUserId").disabled = true;
+            if (form) {
+                const form2 = document.getElementById(form);
+            form2.reset();
+            msg.textContent = "";
+            }
+    })
+    .catch((error) => {
+        console.error("Error:", error);
+        msg.textContent = "Kunde inte hämta användare";
+        msg.style.color = "red";
     });
 }
 
@@ -530,17 +584,18 @@ const getUserBtn = document.getElementById("getUserBtn");
     if (getUserBtn) {
     getUserBtn.addEventListener("click", function(event) {
         event.preventDefault();
-        getUserAdmin();
+        const userId = document.getElementById("getUserId").value || "";
+        const msg = document.getElementById("getUserMsg");
+        if (!userId) { msg.textContent = "Ange id."; return; }
+        getUserAdmin(userId);
     });
 }
 
 function getUserAdmin(userId) {
     const getUserMsg = document.getElementById("getUserMsg");
-    const userData = {
-        id: document.getElementById("getUserUpdateId").value || ""
-    }
-    const url = `http://localhost:8080/api/v1/users/${userData.id}`;
+    const url = `http://localhost:8080/api/v1/users/${userId}`;
     const basicAuth = localStorage.getItem("basicAuth");
+    getUserMsg.textContent = "";
         fetch(url, {
             method: "GET",
             mode: "cors",
@@ -564,9 +619,13 @@ function getUserAdmin(userId) {
             document.getElementById("getUserForUpdateForm").reset();
             getUserMsg.textContent = "";
             updateUserId.disabled = true;
+            const form = document.getElementById("getUserForm");
+            form.reset();
         })
         .catch((error) => {
             console.error("Error:", error);
+            getUserMsg.textContent = "Kunde inte hämta användare. Kontrollera ID.";
+            getUserMsg.style.color = "red"
         });
 }
 
