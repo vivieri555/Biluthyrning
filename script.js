@@ -206,7 +206,7 @@ if (dropAdminBtn) {
 }
 //toggla mellan att visa o ta bort menyn visuellt
 window.onclick = function(event) {
-    if (!event.target.matches('.dropAdminBtn')) {
+    if (!event.target.matches('#dropAdminBtn')) {
         var dropdowns = document.getElementsByClassName("dropdown-content");
         var i;
         for (i = 0; i < dropdowns.length; i++) {
@@ -307,9 +307,17 @@ function sortUsersByField(field) {
     createTableAllUsers(currentUsers);
 }
 
+const updatePutUserForm = document.getElementById("updatePutUserForm");
+if (updatePutUserForm) {
+    updatePutUserForm.addEventListener("submit", function(event) {
+        event.preventDefault();
+    });
+}
+
 const updateUserBtn = document.getElementById("updateUserBtn");
 updateUserBtn.addEventListener("click", function(event) {
     event.preventDefault();
+    event.stopPropagation();
     putUser();
 });
 
@@ -319,7 +327,7 @@ const getUserUpdateBtn = document.getElementById("getUserUpdateBtn");
         event.preventDefault();
         const userId = document.getElementById("getUserUpdateId").value || "";
         const msg = document.getElementById("getUserUpdateMsg");
-
+        msg.textContent = "";
         if(!userId) { msg.textContent = "Vänligen ange id."; return; }
         autofillProfile(userId, "getUserForUpdateForm", msg);
     });
@@ -401,10 +409,11 @@ function putUser() {
             return response.json();
         })
         .then((data) => {
-            if (updateMsg) {
                 updateMsg.style.color = "green";
                 updateMsg.textContent = "Ändringarna har sparats!";
-            }
+                 setTimeout(() => {
+            updateMsg.textContent = "";
+        }, 4000);
             console.log("Uppdatering lyckades:", data);
         })
         .catch((error) => {
@@ -452,7 +461,7 @@ updateUser.forEach(function(updateUser) {
     const basicAuth = localStorage.getItem("basicAuth");
     const url = `http://localhost:8080/api/v1/users/${userId}`;
     const updateMsg = document.getElementById("updateMsg");
-    updateMsg.textContent = "";
+    if (updateMsg) updateMsg.textContent = "";
         fetch(url, {
         method: "GET",
         headers: getHeaders(basicAuth),
