@@ -107,7 +107,6 @@ if (createAccount2Link) {
         if (targetDiv) {
             targetDiv.classList.remove("hidden");
         }
-        document.getElementById("myDropdown").classList.remove("show");
     });
 }
 //Skapa konto för admin
@@ -192,21 +191,19 @@ if (getAllUsersLink) {
             if (targetDiv) {
             targetDiv.classList.remove("hidden");
             }
-        document.getElementById("myDropdown").classList.remove("show");
         getAllUsers();
     });
 }
 //Funktion för dropdownmenyn i adminpanelen
-const dropAdminBtn = document.getElementById("dropAdminBtn");
-if (dropAdminBtn) {
-    dropAdminBtn.onclick = function(event) {
-        document.getElementById("myDropdown").classList.toggle("show");
-        event.stopPropagation();
+const userDropButton = document.getElementById("userDropButton");
+if (userDropButton) {
+    userDropButton.onclick = function(event) {
+        onDropButtonClick(event, "userDropdown");
     };
 }
-//toggla mellan att visa o ta bort menyn visuellt
+//
 window.onclick = function(event) {
-    if (!event.target.matches('#dropAdminBtn')) {
+    if (!event.target.matches('.dropdown-content')) {
         var dropdowns = document.getElementsByClassName("dropdown-content");
         var i;
         for (i = 0; i < dropdowns.length; i++) {
@@ -430,10 +427,6 @@ updateUser.forEach(function(updateUser) {
         hideAllSections();  
         const updateMsg = document.getElementById("updateMsg");
         updateMsg.textContent = "";
-        const dropdown = document.getElementById("myDropdown");
-            if (dropdown) {
-            dropdown.classList.remove("show");
-            }
         const userIdInput = document.getElementById("updateUserId");
         const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
         const isAdmin = localStorage.getItem("isAdmin") === "true";
@@ -506,7 +499,6 @@ const deleteMsg = document.getElementById("deleteMsg");
         if (targetDiv) {
             targetDiv.classList.remove("hidden");
         }
-        document.getElementById("myDropdown").classList.remove("show");
     });
 }
 
@@ -585,7 +577,6 @@ const getUserLink = document.querySelector('a[href="#getUser"]');
         if (targetDiv) {
             targetDiv.classList.remove("hidden");
         }
-        document.getElementById("myDropdown").classList.remove("show");
     });
 }
 
@@ -676,7 +667,6 @@ if (createCarDivLink) {
         if (targetDiv) {
             targetDiv.classList.remove("hidden");
         }
-        document.getElementById("CarAdminDivDrop").classList.remove("show");
     });
 }
 
@@ -854,10 +844,6 @@ const getAllCarsLink = document.querySelectorAll('a[href=".getAllCars"]');
             targetDiv.classList.remove("hidden");
             document.getElementById("startPage").classList.add("hidden");
             }
-        const dropdown = document.getElementById("myDropdown");
-            if (dropdown) {
-            dropdown.classList.remove("show");
-            }
         getCars();
     });
 });
@@ -937,7 +923,6 @@ const deleteCarLink = document.querySelector(`a[href="#deleteCar"]`);
         if (targetDiv) {
             targetDiv.classList.remove("hidden");
         }
-        document.getElementById("CarAdminDivDrop").classList.remove("show");
     });
 }
 
@@ -1056,7 +1041,6 @@ const getACarLink = document.querySelector(`a[href="#getACar"]`);
             if (targetDiv) {
             targetDiv.classList.remove("hidden");
             }
-        document.getElementById("CarAdminDivDrop").classList.remove("show");
     });
 }
 
@@ -1088,24 +1072,16 @@ const getAllCarsUserLink = document.getElementById("getAllCarsUserLink");
 //Funktion för bil dropdownmenyn i adminpanelen 
 const carAdminBtn = document.getElementById("carAdminBtn");
     if (carAdminBtn) {
-    carAdminBtn.onclick = function(event) {
-        document.getElementById("CarAdminDivDrop").classList.toggle("show");
-        event.stopPropagation();
-    };
+        carAdminBtn.onclick = function (event) {
+            onDropButtonClick(event, "CarAdminDivDrop");
+        };
 }
 
-//toggla mellan att visa o ta bort menyn visuellt för bilmenyn i admin
-window.onclick = function(event) {
-    if (!event.target.matches('#carAdminBtn')) {
-        var dropdowns = document.getElementsByClassName("dropdown-content");
-        var i;
-        for (i = 0; i < dropdowns.length; i++) {
-            var openDropdown = dropdowns[i];
-            if (openDropdown.classList.contains('show')) {
-                openDropdown.classList.remove('show');
-            }
-        }
-    }
+function onDropButtonClick(event, id) {
+    const dropdowns = document.getElementsByClassName("dropdown-content");
+    Array.from(dropdowns).forEach((e) => e.classList.remove("show"));
+    document.getElementById(id).classList.add("show");
+    event.stopPropagation();
 }
 
 //Bokningar Boka
@@ -1835,7 +1811,6 @@ if (updateCarLink) {
         if (targetDiv) {
             targetDiv.classList.remove("hidden");
         }
-        document.getElementById("CarAdminDivDrop").classList.remove("show");
     });
 }
 
@@ -1880,7 +1855,6 @@ const returnCarDiv = document.querySelector(`a[href="#returnCarDiv"]`);
         if (targetDiv) {
             targetDiv.classList.remove("hidden");
         }
-        document.getElementById("CarAdminDivDrop").classList.remove("show");
     });
 }
 

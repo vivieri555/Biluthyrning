@@ -407,7 +407,7 @@ width: 20%;
   padding: 14px 16px;
   text-decoration: none;
 }
-    #dropAdminBtn { 
+    #userDropButton { 
   background-color: lightgray; 
   color: rgb(23, 23, 63); 
   padding: 16px; 
@@ -415,7 +415,7 @@ width: 20%;
   border: none; 
   cursor: pointer; 
 } 
-#dropAdminBtn:hover, #dropAdminBtn:focus { 
+#userDropButton:hover, #userDropButton:focus { 
   background-color: rgb(180, 180, 180); 
 } 
 .dropdown { 
