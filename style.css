@@ -349,10 +349,11 @@ width: 20%;
         background-color: rgb(152, 207, 180);
     }
 
-    #carAdminBtn { 
+#carAdminBtn { 
+  display: inline-block;
   background-color: lightgray; 
   color: rgb(23, 23, 63); 
-  padding: 16px; 
+  padding: 14px 16px; 
   font-size: 16px; 
   border: none; 
   cursor: pointer; 
@@ -360,6 +361,9 @@ width: 20%;
 #carAdminBtn:hover, #carAdminBtn:focus { 
   background-color: rgb(180, 180, 180); 
 } 
+.dropdownCarAdminMenu {
+    display: inline-block;
+}
 .adminNavClass { 
     background-color:lightgrey; 
     text-decoration: none; 
@@ -368,7 +372,9 @@ width: 20%;
     list-style-type: none; 
     overflow: hidden; 
     display: flex;
-    li { float: left; 
+    justify-content: center;
+    li {
+        float: left; 
         flex-direction: column; 
         border-right: 1px solid rgb(23, 23, 63); 
     } li a { display: block; 
@@ -396,18 +402,7 @@ width: 20%;
 #adminNav.hidden {
     display: none !important;
 }
-#adminMenu {
-     flex: 2;
-        display: flex;
-        justify-content: center;
-}
-#adminNavClass a {
-  font-size: 16px;
-  text-align: center;
-  padding: 14px 16px;
-  text-decoration: none;
-}
-    #userDropButton { 
+#userDropButton { 
   background-color: lightgray; 
   color: rgb(23, 23, 63); 
   padding: 16px; 
@@ -418,22 +413,14 @@ width: 20%;
 #userDropButton:hover, #userDropButton:focus { 
   background-color: rgb(180, 180, 180); 
 } 
-.dropdown { 
-  position: relative; 
-  display: inline-block; 
-} 
 
 .dropdown-content { 
   display: none; 
   position: absolute; 
   background-color: rgb(180, 180, 180); 
   min-width: 160px; 
-  overflow: auto; 
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); 
-  z-index: 1005; 
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
+  z-index: 1; 
 } 
 
 .dropdown-content a { 
