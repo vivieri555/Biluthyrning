@@ -334,8 +334,11 @@ function autofillProfileForAdmin(userId, msg) {
         document.getElementById("updateEmail").value = user.email || "";
         document.getElementById("updateUsername").value = user.username || "";
         document.getElementById("updatePassword").value = "";
+        document.getElementById("updateRole").value = user.role || "";
+        document.getElementById("updatenoOfOrders").value = user.noOfOrders || "";
         
         document.getElementById("updateUserId").disabled = true;
+         document.getElementById("updatenoOfOrders").disabled = true;
         
         const searchForm = document.getElementById("getUserForUpdateForm");
         if (searchForm) searchForm.reset();
@@ -359,6 +362,7 @@ function putUser() {
     const email = document.getElementById("updateEmail")?.value || "";
     const updatePassword = document.getElementById("updatePassword")?.value || "";
     const updateUsername = document.getElementById("updateUsername")?.value || "";
+    const updateRoles = document.getElementById("updateRole").value || "";
     const updateMsg = document.getElementById("updateMsg");
         updateMsg.textContent = "";
             if (!userId) {
@@ -372,7 +376,8 @@ function putUser() {
         phone: phone,
         email: email,
         username: updateUsername,
-        password: updatePassword
+        password: updatePassword,
+        role: updateRoles
     };
     const url = `http://localhost:8080/api/v1/users/${userId}`;
         fetch(url, {
@@ -416,9 +421,10 @@ updateUser.forEach(function(updateUser) {
             const updateDiv = document.getElementById("getUserForUpdate");
             if (updateDiv) {
                 updateDiv.classList.remove("hidden");
+                userIdInput.disabled = true;
+                autofillProfileForAdmin(userId);
             } 
         } else {
-                console.log("hej");
                 const targetDiv = document.getElementById("updateUser");
                 if (targetDiv) {
                     targetDiv.classList.remove("hidden");
@@ -430,7 +436,7 @@ updateUser.forEach(function(updateUser) {
         }
     });
 });
-
+    //För användare
     function autofillProfile(userId, form, msg) {
     const basicAuth = localStorage.getItem("basicAuth");
     const url = `http://localhost:8080/api/v1/users/${userId}`;
@@ -456,7 +462,11 @@ updateUser.forEach(function(updateUser) {
         document.getElementById("updateEmail").value = user.email || "";
         document.getElementById("updateUsername").value = user.username || "";
         document.getElementById("updatePassword").value = "";
+        document.getElementById("updateRole").value = user.role || "";
+        document.getElementById("updatenoOfOrders").value = user.noOfOrders || "";
             document.getElementById("updateUserId").disabled = true;
+            document.getElementById("updateRole").disabled = true;
+             document.getElementById("updatenoOfOrders").disabled = true;
             if (form) {
                 const form2 = document.getElementById(form);
             form2.reset();
@@ -597,9 +607,14 @@ function getUserAdmin(userId) {
             document.getElementById("updateEmail").value = user.email || "";
             document.getElementById("updateUsername").value = user.username || "";
             document.getElementById("updatePassword").value = "";
+            const updateRole = document.getElementById("updateRole").value = user.role || "";
+            const noOfOrders = document.getElementById("updatenoOfOrders").value = user.noOfOrders || "";
+            updateRole.disabled = true;
+            noOfOrders.disabled = true;
             document.getElementById("getUserForUpdateForm").reset();
             getUserMsg.textContent = "";
             updateUserId.disabled = true;
+
             const form = document.getElementById("getUserForm");
             form.reset();
         })

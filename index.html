@@ -51,7 +51,7 @@
   <div id="userDropdown" class="dropdown-content"> 
     <a href="#createAccount2">Skapa ny användare</a> 
     <a href="#getAllUsers">Hämta alla användare</a> 
-    <a href="#getUserForUpdate">Uppdatera användare</a> 
+    <a href="#getUserForUpdate">Uppdatera din användare</a> 
     <a href="#deleteUser">Ta bort användare</a>
     <a href="#getUser">Hämta specifik användare</a>
   </div> 
@@ -136,7 +136,7 @@
         <h2>Uppdatera användare</h2>
         <form id="updatePutUserForm">
             <label for="updateUserId">Användar-ID:</label>
-<input type="text" id="updateUserId" name="updateUserId"><br>
+<input type="text" readonly id="updateUserId" name="updateUserId"><br>
 
 <label for="updateUsername">Användarnamn:</label>
 <input type="text" id="updateUsername" name="updateUsername"><br>
@@ -155,6 +155,11 @@
 
 <label for="updateEmail">E-post:</label>
 <input type="email" id="updateEmail" name="updateEmail"><br>
+
+<label for="updateRole">Roll:</label>
+<input type="text" id="updateRole" name="updateRole">
+<label for="updatenoOfOrders">Antal bokningar:</label>
+<input type="text" readonly id="updatenoOfOrders" name="updatenoOfOrders">
 
         <button typ="button" id="updateUserBtn" class="positiveBtn">Spara</button>
 
@@ -256,7 +261,7 @@
     </form>
     </div>
 
-    <!-- Hämta användare som ska uppdateras Admin -->
+    <!-- Hämta användare som ska uppdateras -->
     <div id="getUserForUpdate" class="hidden">
     <h2>Vilken användare vill du uppdatera?</h2>
     <form id="getUserForUpdateForm">
